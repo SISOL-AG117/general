@@ -1985,27 +1985,129 @@ footer > p {
 }
 
 .amara-chat {
-  bottom: 22px;
+  bottom: 20px;
   display: grid;
-  gap: 12px;
+  gap: 14px;
   justify-items: end;
   position: fixed;
-  right: 22px;
-  z-index: 60;
+  right: 20px;
+  z-index: 80;
+}
+
+.amara-greeting {
+  align-items: center;
+  animation: amaraGreetingIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  background: white;
+  border: 0;
+  border-radius: 18px 18px 4px;
+  box-shadow: 0 18px 55px rgba(4, 27, 20, 0.24);
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  gap: 11px;
+  grid-template-columns: auto 1fr;
+  max-width: 310px;
+  padding: 13px 35px 13px 13px;
+  position: relative;
+  text-align: left;
+}
+
+@keyframes amaraGreetingIn {
+  from { opacity: 0; transform: translateY(15px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.amara-greeting::after {
+  border-color: white transparent transparent;
+  border-style: solid;
+  border-width: 10px 0 0 12px;
+  bottom: -9px;
+  content: '';
+  position: absolute;
+  right: 19px;
+}
+
+.amara-greeting-avatar,
+.amara-avatar {
+  align-items: center;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 20%),
+    linear-gradient(145deg, var(--coral), #ffb24c);
+  border-radius: 50%;
+  color: var(--deep);
+  display: flex;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  justify-content: center;
+  position: relative;
+}
+
+.amara-greeting-avatar {
+  font-size: 1rem;
+  height: 43px;
+  width: 43px;
+}
+
+.amara-greeting-avatar i,
+.amara-avatar i {
+  background: #32d36b;
+  border: 2px solid white;
+  border-radius: 50%;
+  bottom: 0;
+  height: 11px;
+  position: absolute;
+  right: 0;
+  width: 11px;
+}
+
+.amara-greeting strong,
+.amara-greeting small {
+  display: block;
+}
+
+.amara-greeting strong {
+  font-size: 0.78rem;
+  margin-bottom: 3px;
+}
+
+.amara-greeting small {
+  color: rgba(23, 55, 46, 0.65);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.amara-greeting-close {
+  align-items: center;
+  color: rgba(23, 55, 46, 0.42);
+  display: flex;
+  font-size: 1.1rem;
+  height: 26px;
+  justify-content: center;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 26px;
 }
 
 .amara-launcher {
   align-items: center;
-  background: var(--lime);
+  background: linear-gradient(135deg, var(--lime), #baf42e);
   border: 0;
   border-radius: 999px;
-  box-shadow: 0 16px 45px rgba(5, 30, 22, 0.28);
+  box-shadow: 0 16px 45px rgba(5, 30, 22, 0.32);
   color: var(--deep);
   cursor: pointer;
   display: flex;
   gap: 10px;
   min-height: 56px;
   padding: 7px 20px 7px 8px;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.amara-launcher:hover {
+  box-shadow: 0 20px 55px rgba(5, 30, 22, 0.38);
+  transform: translateY(-3px);
 }
 
 .amara-launcher > span {
@@ -2019,7 +2121,7 @@ footer > p {
   width: 42px;
 }
 
-.amara-launcher svg {
+.amara-launcher > span svg {
   height: 21px;
   width: 21px;
 }
@@ -2030,40 +2132,59 @@ footer > p {
   text-transform: uppercase;
 }
 
+.amara-notification {
+  align-items: center;
+  background: var(--coral);
+  border: 2px solid white;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  font-size: 0.58rem;
+  font-style: normal;
+  height: 20px;
+  justify-content: center;
+  position: absolute;
+  right: -3px;
+  top: -5px;
+  width: 20px;
+}
+
 .amara-window {
-  background: #f8f6f0;
-  border: 1px solid rgba(23, 55, 46, 0.12);
-  box-shadow: 0 28px 80px rgba(4, 27, 20, 0.3);
+  animation: amaraWindowIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  background: #efece4;
+  border: 1px solid rgba(23, 55, 46, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 30px 90px rgba(4, 27, 20, 0.35);
   color: var(--ink);
   display: grid;
   grid-template-rows: auto minmax(190px, 1fr) auto auto auto;
-  height: min(650px, calc(100svh - 105px));
-  max-height: 650px;
+  height: min(680px, calc(100svh - 100px));
+  max-height: 680px;
   overflow: hidden;
-  width: min(390px, calc(100vw - 32px));
+  width: min(410px, calc(100vw - 32px));
+}
+
+@keyframes amaraWindowIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .amara-header {
   align-items: center;
-  background: var(--deep);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(215, 255, 82, 0.14), transparent 38%),
+    linear-gradient(135deg, #163f34, var(--deep));
   color: white;
   display: grid;
   gap: 12px;
   grid-template-columns: auto 1fr auto;
-  padding: 16px;
+  padding: 17px 16px;
 }
 
 .amara-avatar {
-  align-items: center;
-  background: var(--coral);
-  border-radius: 50%;
-  color: var(--deep);
-  display: flex;
-  font-family: 'Manrope', sans-serif;
   font-size: 1.2rem;
-  height: 45px;
-  justify-content: center;
-  width: 45px;
+  height: 48px;
+  width: 48px;
 }
 
 .amara-header strong,
@@ -2077,44 +2198,56 @@ footer > p {
 }
 
 .amara-header span {
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 0.58rem;
-  margin-top: 3px;
-}
-
-.amara-header i {
-  background: var(--lime);
-  border-radius: 50%;
-  display: inline-block;
-  height: 6px;
-  width: 6px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.62rem;
+  margin-top: 4px;
 }
 
 .amara-header button {
-  background: transparent;
-  border: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
   color: white;
   cursor: pointer;
-  font-size: 1.7rem;
+  font-size: 1.45rem;
   line-height: 1;
-  min-height: 42px;
-  min-width: 42px;
+  min-height: 38px;
+  min-width: 38px;
 }
 
 .amara-messages {
+  background-color: #ece9e0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(23, 55, 46, 0.035) 0 1px, transparent 1px),
+    radial-gradient(circle at 75% 70%, rgba(23, 55, 46, 0.03) 0 1px, transparent 1px);
+  background-size: 28px 28px, 36px 36px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
   overflow-y: auto;
-  padding: 18px 16px 12px;
+  padding: 15px 15px 12px;
+  scrollbar-color: rgba(23, 55, 46, 0.18) transparent;
+  scrollbar-width: thin;
+}
+
+.amara-day {
+  align-self: center;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  color: rgba(23, 55, 46, 0.52);
+  font-size: 0.55rem;
+  padding: 5px 10px;
 }
 
 .amara-message {
-  border-radius: 17px;
-  font-size: 0.78rem;
-  line-height: 1.55;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(4, 27, 20, 0.05);
+  display: grid;
+  font-size: 0.79rem;
+  gap: 4px;
+  line-height: 1.5;
   max-width: 88%;
-  padding: 11px 13px;
+  padding: 10px 12px 6px;
 }
 
 .amara-message.amara {
@@ -2125,52 +2258,142 @@ footer > p {
 
 .amara-message.user {
   align-self: flex-end;
-  background: var(--ink);
+  background: #dff7a7;
   border-bottom-right-radius: 4px;
-  color: white;
+  color: var(--deep);
+}
+
+.amara-message small {
+  color: rgba(23, 55, 46, 0.42);
+  font-size: 0.5rem;
+  justify-self: end;
+}
+
+.amara-message.user small {
+  color: rgba(23, 55, 46, 0.55);
+}
+
+.amara-typing {
+  align-items: center;
+  align-self: flex-start;
+  background: white;
+  border-radius: 16px 16px 16px 4px;
+  display: flex;
+  gap: 4px;
+  min-height: 39px;
+  padding: 0 14px;
+}
+
+.amara-typing i {
+  animation: amaraDot 1.1s infinite ease-in-out;
+  background: rgba(23, 55, 46, 0.4);
+  border-radius: 50%;
+  height: 6px;
+  width: 6px;
+}
+
+.amara-typing i:nth-child(2) { animation-delay: 0.15s; }
+.amara-typing i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes amaraDot {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
 }
 
 .amara-quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+  width: 90%;
+}
+
+.amara-quick > span {
+  color: rgba(23, 55, 46, 0.46);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  padding-left: 4px;
+  text-transform: uppercase;
 }
 
 .amara-quick button {
-  background: transparent;
-  border: 1px solid rgba(23, 55, 46, 0.22);
-  border-radius: 999px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(23, 55, 46, 0.1);
+  border-radius: 11px;
   color: var(--ink);
   cursor: pointer;
+  display: flex;
   font-size: 0.65rem;
-  padding: 8px 11px;
+  justify-content: space-between;
+  padding: 9px 11px;
   text-align: left;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.amara-quick button:hover {
+  background: white;
+  transform: translateX(3px);
+}
+
+.amara-quick button b {
+  color: var(--coral);
+  font-size: 1rem;
 }
 
 .amara-advisor {
   align-items: center;
-  background: rgba(215, 255, 82, 0.35);
-  display: flex;
-  font-size: 0.68rem;
+  background: #f8f6f0;
+  border-top: 1px solid rgba(23, 55, 46, 0.09);
+  display: grid;
+  font-size: 0.7rem;
   font-weight: 600;
-  justify-content: space-between;
-  margin: 0 16px;
-  padding: 10px 12px;
+  gap: 10px;
+  grid-template-columns: auto 1fr auto;
+  padding: 10px 15px 6px;
   text-decoration: none;
 }
 
+.amara-advisor-icon {
+  align-items: center;
+  background: var(--lime);
+  border-radius: 50%;
+  display: flex;
+  font-size: 0.55rem;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.amara-advisor small {
+  color: rgba(23, 55, 46, 0.45);
+  display: block;
+  font-size: 0.5rem;
+  font-weight: 500;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.amara-advisor > b {
+  color: var(--coral);
+  font-size: 1rem;
+}
+
 .amara-privacy {
+  background: #f8f6f0;
   color: rgba(23, 55, 46, 0.48);
   font-size: 0.52rem;
   line-height: 1.4;
-  margin: 8px 16px;
+  margin: 0;
+  padding: 4px 15px 8px;
 }
 
 .amara-form {
-  border-top: 1px solid var(--line);
+  align-items: center;
+  background: white;
+  border-top: 1px solid rgba(23, 55, 46, 0.1);
   display: grid;
   grid-template-columns: 1fr auto;
-  padding: 10px;
+  padding: 9px 10px 10px 15px;
 }
 
 .amara-form input {
@@ -2184,14 +2407,31 @@ footer > p {
 }
 
 .amara-form button {
-  background: var(--coral);
+  align-items: center;
+  background: var(--ink);
   border: 0;
   border-radius: 50%;
-  color: var(--deep);
+  color: var(--lime);
   cursor: pointer;
-  font-size: 1.15rem;
+  display: flex;
   height: 42px;
+  justify-content: center;
+  transition: opacity 0.2s ease, transform 0.2s ease;
   width: 42px;
+}
+
+.amara-form button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.amara-form button:disabled {
+  cursor: default;
+  opacity: 0.28;
+}
+
+.amara-form button svg {
+  height: 19px;
+  width: 19px;
 }
 
 @media (max-width: 1050px) {

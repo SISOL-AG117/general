@@ -9,9 +9,11 @@ const copy = {
     open: 'Habla con Amara',
     close: 'Cerrar asistente',
     online: 'En línea',
+    typing: 'Amara está escribiendo',
     placeholder: 'Escribe tu pregunta...',
     send: 'Enviar',
-    welcome: '¡Hola! Soy Amara, asistente virtual de AG117. Puedo orientarte sobre el proyecto, precios, residencias, entrega y atención con Ivonne. ¿Qué te gustaría conocer?',
+    greeting: 'Hola, soy Amara. ¿Te ayudo a conocer AG117?',
+    welcome: '¡Hola! Soy Amara, tu anfitriona virtual de AG117. Estoy aquí para acompañarte y resolver tus primeras dudas con calma. Podemos comenzar por el proyecto, las residencias, precios o la entrega. ¿Qué te gustaría descubrir?',
     fallback: 'Todavía no cuento con información confirmada sobre eso. Para darte una respuesta precisa, puedo comunicarte con Ivonne Hernández Monroy, asesora inmobiliaria de AG117.',
     privacy: 'Amara brinda orientación general con información publicada. No solicita ni muestra documentos confidenciales.',
     advisor: 'Hablar con Ivonne',
@@ -23,9 +25,11 @@ const copy = {
     open: 'Talk to Amara',
     close: 'Close assistant',
     online: 'Online',
+    typing: 'Amara is typing',
     placeholder: 'Type your question...',
     send: 'Send',
-    welcome: 'Hello! I am Amara, AG117’s virtual assistant. I can guide you through the project, prices, residences, delivery and personal assistance with Ivonne. What would you like to know?',
+    greeting: 'Hi, I am Amara. May I help you discover AG117?',
+    welcome: 'Hello! I am Amara, your virtual host at AG117. I am here to guide you and answer your first questions at your own pace. We can begin with the project, residences, prices or delivery. What would you like to discover?',
     fallback: 'I do not have confirmed information about that yet. To give you an accurate answer, I can connect you with Ivonne Hernández Monroy, AG117 real estate advisor.',
     privacy: 'Amara provides general guidance using published information. It does not request or display confidential documents.',
     advisor: 'Talk to Ivonne',
@@ -119,18 +123,44 @@ function ChatIcon() {
   )
 }
 
+function SendIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m3 11 17-8-7 18-2.5-7.5Z" />
+      <path d="m10.5 13.5 4-4" />
+    </svg>
+  )
+}
+
+const messageTime = () => new Intl.DateTimeFormat([], {
+  hour: '2-digit',
+  minute: '2-digit',
+}).format(new Date())
+
 export default function AmaraChat({ language }) {
   const ui = copy[language]
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
+  const [typing, setTyping] = useState(false)
+  const [showGreeting, setShowGreeting] = useState(false)
   const [messages, setMessages] = useState([
-    { id: 0, role: 'amara', text: ui.welcome },
+    { id: 0, role: 'amara', text: ui.welcome, time: messageTime() },
   ])
   const listRef = useRef(null)
+  const replyTimer = useRef(null)
+  const greetingTimer = useRef(null)
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, open])
+  }, [messages, open, typing])
+
+  useEffect(() => {
+    greetingTimer.current = window.setTimeout(() => setShowGreeting(true), 1200)
+    return () => {
+      window.clearTimeout(greetingTimer.current)
+      window.clearTimeout(replyTimer.current)
+    }
+  }, [])
 
   const lastQuestion = useMemo(
     () => [...messages].reverse().find((message) => message.role === 'user')?.text || '',
@@ -139,13 +169,30 @@ export default function AmaraChat({ language }) {
 
   const sendMessage = (value) => {
     const question = value.trim()
-    if (!question) return
+    if (!question || typing) return
     setMessages((current) => [
       ...current,
-      { id: Date.now(), role: 'user', text: question },
-      { id: Date.now() + 1, role: 'amara', text: getReply(question, language) },
+      { id: Date.now(), role: 'user', text: question, time: messageTime() },
     ])
     setInput('')
+    setTyping(true)
+    replyTimer.current = window.setTimeout(() => {
+      setMessages((current) => [
+        ...current,
+        {
+          id: Date.now() + 1,
+          role: 'amara',
+          text: getReply(question, language),
+          time: messageTime(),
+        },
+      ])
+      setTyping(false)
+    }, 700)
+  }
+
+  const openChat = () => {
+    setOpen(true)
+    setShowGreeting(false)
   }
 
   const whatsappText = language === 'en'
@@ -154,28 +201,50 @@ export default function AmaraChat({ language }) {
 
   return (
     <aside className={open ? 'amara-chat is-open' : 'amara-chat'} aria-label={ui.role}>
+      {!open && showGreeting && (
+        <button className="amara-greeting" type="button" onClick={openChat}>
+          <span className="amara-greeting-close" onClick={(event) => {
+            event.stopPropagation()
+            setShowGreeting(false)
+          }}>×</span>
+          <span className="amara-greeting-avatar">A<i /></span>
+          <span>
+            <strong>Amara</strong>
+            <small>{ui.greeting}</small>
+          </span>
+        </button>
+      )}
+
       {open && (
         <div className="amara-window">
           <header className="amara-header">
-            <div className="amara-avatar" aria-hidden="true">A</div>
+            <div className="amara-avatar" aria-hidden="true">A<i /></div>
             <div>
               <strong>{ui.title}</strong>
-              <span><i /> {ui.online} · {ui.role}</span>
+              <span>{typing ? ui.typing : `${ui.online} · ${ui.role}`}</span>
             </div>
             <button type="button" onClick={() => setOpen(false)} aria-label={ui.close}>×</button>
           </header>
 
           <div className="amara-messages" ref={listRef} aria-live="polite">
+            <div className="amara-day">{language === 'en' ? 'Today' : 'Hoy'}</div>
             {messages.map((message) => (
               <div key={message.id} className={`amara-message ${message.role}`}>
-                {message.text}
+                <span>{message.text}</span>
+                <small>{message.time}{message.role === 'user' ? ' ✓✓' : ''}</small>
               </div>
             ))}
+            {typing && (
+              <div className="amara-typing" aria-label={ui.typing}>
+                <i /><i /><i />
+              </div>
+            )}
             {messages.length === 1 && (
               <div className="amara-quick">
+                <span>{language === 'en' ? 'Choose a question' : 'Elige una pregunta'}</span>
                 {ui.quick.map((question) => (
                   <button key={question} type="button" onClick={() => sendMessage(question)}>
-                    {question}
+                    {question}<b>›</b>
                   </button>
                 ))}
               </div>
@@ -188,7 +257,9 @@ export default function AmaraChat({ language }) {
             target="_blank"
             rel="noreferrer"
           >
-            {ui.advisor} <span>↗</span>
+            <span className="amara-advisor-icon">IV</span>
+            <span><small>{language === 'en' ? 'Personal assistance' : 'Atención personal'}</small>{ui.advisor}</span>
+            <b>↗</b>
           </a>
           <p className="amara-privacy">{ui.privacy}</p>
 
@@ -205,7 +276,9 @@ export default function AmaraChat({ language }) {
               placeholder={ui.placeholder}
               aria-label={ui.placeholder}
             />
-            <button type="submit" aria-label={ui.send}>↑</button>
+            <button type="submit" aria-label={ui.send} disabled={!input.trim() || typing}>
+              <SendIcon />
+            </button>
           </form>
         </div>
       )}
@@ -213,12 +286,13 @@ export default function AmaraChat({ language }) {
       <button
         className="amara-launcher"
         type="button"
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => (open ? setOpen(false) : openChat())}
         aria-label={open ? ui.close : ui.open}
         aria-expanded={open}
       >
         <span><ChatIcon /></span>
         <strong>{open ? ui.close : ui.open}</strong>
+        {!open && <i className="amara-notification">1</i>}
       </button>
     </aside>
   )
