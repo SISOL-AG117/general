@@ -11,20 +11,31 @@
       * { box-sizing: border-box; }
       html, body { height: 100%; margin: 0; overflow: hidden; }
       body { background: #102d25; color: white; font-family: Arial, sans-serif; }
-      .ar-ui { inset: 0; pointer-events: none; position: fixed; z-index: 10; }
+      .ar-ui {
+        height: var(--vv-height, 100vh);
+        left: var(--vv-left, 0px);
+        pointer-events: none;
+        position: fixed;
+        top: var(--vv-top, 0px);
+        width: var(--vv-width, 100vw);
+        z-index: 10;
+      }
       .ar-start {
         align-items: center;
         background:
           radial-gradient(circle at 50% 32%, rgba(215,255,82,.13), transparent 34%),
           rgba(8, 28, 23, .96);
         display: flex;
-        inset: 0;
+        height: var(--vv-height, 100vh);
         justify-content: center;
+        left: var(--vv-left, 0px);
         padding: 28px;
         pointer-events: auto;
         position: fixed;
         text-align: center;
+        top: var(--vv-top, 0px);
         transition: opacity .35s ease, visibility .35s ease;
+        width: var(--vv-width, 100vw);
         z-index: 20;
       }
       .ar-start.is-hidden { opacity: 0; pointer-events: none; visibility: hidden; }
@@ -155,6 +166,7 @@
         top: 50%;
         transform: translateY(-50%);
         transition: opacity .25s ease;
+        z-index: 30;
       }
       .model-controls button {
         align-items: center;
@@ -193,13 +205,25 @@
       body.is-persisting .scan-guide { opacity: 0; }
       .mindar-ui-overlay { z-index: 8 !important; }
       @media (max-width: 640px) {
-        .model-controls {
-          bottom: max(104px, calc(env(safe-area-inset-bottom) + 94px));
-          left: 50%;
-          right: auto;
-          top: auto;
-          transform: translateX(-50%);
+        .ar-top { padding-left: 14px; padding-right: 14px; }
+        .gesture-hint {
+          font-size: .58rem;
+          max-width: calc(100% - 28px);
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
+        .model-controls {
+          bottom: max(116px, calc(env(safe-area-inset-bottom) + 106px));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          left: 12px;
+          max-width: none;
+          padding: 7px;
+          right: 12px;
+          top: auto;
+          transform: none;
+          width: auto;
+        }
+        .model-controls button { height: 42px; width: 100%; }
         .ar-message { bottom: max(18px, env(safe-area-inset-bottom)); }
       }
     </style>
@@ -267,7 +291,7 @@
       <a-entity light="type: directional; intensity: 2.2; color: #fff0cc" position="-1 2 1"></a-entity>
 
       <a-entity id="image-target" mindar-image-target="targetIndex: 0">
-        <a-entity id="ag117-model" position="0 0 0.025" rotation="90 0 0" scale="0.035 0.035 0.035"></a-entity>
+        <a-entity id="ag117-model" position="0 0 0.025" rotation="65 0 0" scale="0.035 0.035 0.035"></a-entity>
       </a-entity>
     </a-scene>
 
@@ -303,7 +327,7 @@
       let isMarkerVisible = false
       let modelZoom = 1
       let modelYaw = 0
-      let modelTilt = 0
+      let modelTilt = -25
       let modelX = 0
       let modelY = 0
       let dragging = false
@@ -311,6 +335,24 @@
       let pointerY = 0
       let pinchDistance = 0
       let currentErrorKey = null
+
+      const syncVisualViewport = () => {
+        const viewport = window.visualViewport
+        const width = viewport?.width || window.innerWidth
+        const height = viewport?.height || window.innerHeight
+        const left = viewport?.offsetLeft || 0
+        const top = viewport?.offsetTop || 0
+        const rootStyle = document.documentElement.style
+        rootStyle.setProperty('--vv-width', `${width}px`)
+        rootStyle.setProperty('--vv-height', `${height}px`)
+        rootStyle.setProperty('--vv-left', `${left}px`)
+        rootStyle.setProperty('--vv-top', `${top}px`)
+      }
+
+      syncVisualViewport()
+      window.visualViewport?.addEventListener('resize', syncVisualViewport)
+      window.visualViewport?.addEventListener('scroll', syncVisualViewport)
+      window.addEventListener('resize', syncVisualViewport)
 
       const translations = {
         es: {
@@ -398,10 +440,12 @@
         model.setAttribute('position', `${modelX} ${modelY} 0.025`)
       }
 
+      const normalizeAngle = (angle) => ((angle + 180) % 360 + 360) % 360 - 180
+
       const resetModel = () => {
         modelZoom = 1
         modelYaw = 0
-        modelTilt = 0
+        modelTilt = -25
         modelX = 0
         modelY = 0
         applyModelTransform()
@@ -413,8 +457,8 @@
       }
 
       const moveModel = (x, y) => {
-        modelX = Math.min(.65, Math.max(-.65, modelX + x))
-        modelY = Math.min(.65, Math.max(-.65, modelY + y))
+        modelX = Math.min(1.6, Math.max(-1.6, modelX + x))
+        modelY = Math.min(1.6, Math.max(-1.6, modelY + y))
         applyModelTransform()
       }
 
@@ -573,6 +617,7 @@
       }
 
       scene.addEventListener('arReady', () => {
+        syncVisualViewport()
         installPersistentTracking()
         document.body.classList.add('is-started')
         startScreen.classList.add('is-hidden')
@@ -584,25 +629,25 @@
       })
 
       rotateLeftButton.addEventListener('click', () => {
-        modelYaw -= 15
+        modelYaw = normalizeAngle(modelYaw - 20)
         applyModelTransform()
       })
       rotateRightButton.addEventListener('click', () => {
-        modelYaw += 15
+        modelYaw = normalizeAngle(modelYaw + 20)
         applyModelTransform()
       })
       tiltUpButton.addEventListener('click', () => {
-        modelTilt = Math.min(45, modelTilt + 10)
+        modelTilt = normalizeAngle(modelTilt - 15)
         applyModelTransform()
       })
       tiltDownButton.addEventListener('click', () => {
-        modelTilt = Math.max(-45, modelTilt - 10)
+        modelTilt = normalizeAngle(modelTilt + 15)
         applyModelTransform()
       })
-      moveUpButton.addEventListener('click', () => moveModel(0, .08))
-      moveDownButton.addEventListener('click', () => moveModel(0, -.08))
-      moveLeftButton.addEventListener('click', () => moveModel(-.08, 0))
-      moveRightButton.addEventListener('click', () => moveModel(.08, 0))
+      moveUpButton.addEventListener('click', () => moveModel(0, .14))
+      moveDownButton.addEventListener('click', () => moveModel(0, -.14))
+      moveLeftButton.addEventListener('click', () => moveModel(-.14, 0))
+      moveRightButton.addEventListener('click', () => moveModel(.14, 0))
       zoomInButton.addEventListener('click', () => changeZoom(.15))
       zoomOutButton.addEventListener('click', () => changeZoom(-.15))
       resetButton.addEventListener('click', resetModel)
@@ -626,8 +671,8 @@
           const deltaY = event.clientY - pointerY
           pointerX = event.clientX
           pointerY = event.clientY
-          modelYaw += deltaX * .7
-          modelTilt = Math.min(45, Math.max(-45, modelTilt - deltaY * .4))
+          modelYaw = normalizeAngle(modelYaw + deltaX * .8)
+          modelTilt = normalizeAngle(modelTilt + deltaY * .75)
           applyModelTransform()
         })
 
@@ -667,10 +712,10 @@
       window.addEventListener('keydown', (event) => {
         if (!document.body.classList.contains('has-model')) return
         const actions = {
-          ArrowUp: () => moveModel(0, .08),
-          ArrowDown: () => moveModel(0, -.08),
-          ArrowLeft: () => moveModel(-.08, 0),
-          ArrowRight: () => moveModel(.08, 0),
+          ArrowUp: () => moveModel(0, .14),
+          ArrowDown: () => moveModel(0, -.14),
+          ArrowLeft: () => moveModel(-.14, 0),
+          ArrowRight: () => moveModel(.14, 0),
           '+': () => changeZoom(.15),
           '-': () => changeZoom(-.15),
           r: resetModel,

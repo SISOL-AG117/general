@@ -2097,6 +2097,18 @@ footer > p {
     padding: 20px 22px;
   }
 
+  .site-language-toggle {
+    align-items: center;
+    background: rgba(16, 45, 37, 0.9);
+    display: flex;
+    justify-content: center;
+    min-height: 42px;
+    min-width: 52px;
+    padding: 0 12px;
+    position: relative;
+    z-index: 4;
+  }
+
   .main-nav {
     align-items: flex-start;
     background: var(--deep);
@@ -2497,6 +2509,11 @@ footer > p {
   .site-header {
     padding-left: 18px;
     padding-right: 18px;
+  }
+
+  .site-language-toggle {
+    min-width: 48px;
+    padding: 0 10px;
   }
 
   .main-nav {
