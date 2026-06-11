@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import './App.css'
 import { translateDocument } from './pageTranslations.js'
+import AmaraChat from './AmaraChat.jsx'
 
 const Project3D = lazy(() => import('./Project3D.jsx'))
 
@@ -631,6 +632,7 @@ function App() {
           © 2026 Ivonne Hernández Monroy. Desarrollo de la página y derechos reservados.
         </span>
       </footer>
+      <AmaraChat key={language} language={language} />
     </main>
   )
 }
