@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#102d25" />
+    <title>AG117 | Realidad aumentada</title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; overflow: hidden; }
+      body { background: #102d25; color: white; font-family: Arial, sans-serif; }
+      .ar-ui { inset: 0; pointer-events: none; position: fixed; z-index: 10; }
+      .ar-start {
+        align-items: center;
+        background:
+          radial-gradient(circle at 50% 32%, rgba(215,255,82,.13), transparent 34%),
+          rgba(8, 28, 23, .96);
+        display: flex;
+        inset: 0;
+        justify-content: center;
+        padding: 28px;
+        pointer-events: auto;
+        position: fixed;
+        text-align: center;
+        transition: opacity .35s ease, visibility .35s ease;
+        z-index: 20;
+      }
+      .ar-start.is-hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+      .ar-start-card { max-width: 420px; width: 100%; }
+      .ar-start-kicker {
+        color: #d7ff52;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+      }
+      .ar-start h1 {
+        font-size: clamp(2rem, 9vw, 3.8rem);
+        letter-spacing: -.065em;
+        line-height: .95;
+        margin: 15px 0 18px;
+      }
+      .ar-start p { color: rgba(255,255,255,.72); line-height: 1.55; margin: 0 auto 24px; }
+      .camera-start {
+        align-items: center;
+        background: #d7ff52;
+        border: 0;
+        border-radius: 999px;
+        color: #102d25;
+        cursor: pointer;
+        display: inline-flex;
+        font: inherit;
+        font-weight: 800;
+        gap: 10px;
+        justify-content: center;
+        min-height: 56px;
+        padding: 0 26px;
+        width: 100%;
+      }
+      .camera-start:disabled { cursor: wait; opacity: .65; }
+      .camera-note { font-size: .76rem; margin-top: 14px; opacity: .55; }
+      .camera-error {
+        color: #ffd7c9;
+        display: none;
+        font-size: .82rem;
+        line-height: 1.45;
+        margin: 16px auto 0;
+      }
+      .camera-error.is-visible { display: block; }
+      .ar-top {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        padding: max(18px, env(safe-area-inset-top)) 18px 0;
+      }
+      .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: -.08em; }
+      .brand span { color: #d7ff52; font-size: .78rem; margin-left: 3px; }
+      .close {
+        align-items: center;
+        background: rgba(16, 45, 37, .86);
+        border: 1px solid rgba(255,255,255,.25);
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        font-size: 1.25rem;
+        height: 44px;
+        justify-content: center;
+        pointer-events: auto;
+        text-decoration: none;
+        width: 44px;
+      }
+      .scan-guide {
+        border: 1px solid rgba(215,255,82,.7);
+        height: min(48vw, 280px);
+        left: 50%;
+        opacity: 0;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        transition: opacity .3s ease;
+        width: min(76vw, 440px);
+      }
+      .scan-guide::before, .scan-guide::after {
+        content: '';
+        inset: 12px;
+        position: absolute;
+      }
+      .scan-guide::before { border-left: 3px solid #d7ff52; border-right: 3px solid #d7ff52; }
+      .scan-guide::after { border-bottom: 3px solid #d7ff52; border-top: 3px solid #d7ff52; }
+      .ar-message {
+        background: rgba(16,45,37,.88);
+        bottom: max(24px, env(safe-area-inset-bottom));
+        left: 50%;
+        max-width: calc(100% - 36px);
+        padding: 14px 18px;
+        position: absolute;
+        text-align: center;
+        transform: translateX(-50%);
+        width: 430px;
+        opacity: 0;
+        transition: opacity .25s ease;
+      }
+      .ar-message strong { color: #d7ff52; display: block; font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; }
+      .ar-message span { display: block; font-size: .78rem; line-height: 1.45; margin-top: 5px; opacity: .72; }
+      body.is-tracking .scan-guide { opacity: 0; }
+      body.is-tracking .ar-message { background: rgba(16,45,37,.72); }
+      body.is-started .scan-guide, body.is-started .ar-message { opacity: 1; }
+      body.is-started.is-tracking .scan-guide { opacity: 0; }
+      .mindar-ui-overlay { z-index: 8 !important; }
+    </style>
+  </head>
+  <body>
+    <div class="ar-start" id="ar-start">
+      <div class="ar-start-card">
+        <span class="ar-start-kicker">Experiencia inmersiva AG117</span>
+        <h1>Haz que la maqueta cobre vida.</h1>
+        <p>
+          Permite el acceso a la cámara y apunta a la propaganda completa.
+          La maqueta aparecerá directamente sobre la imagen.
+        </p>
+        <button class="camera-start" id="camera-start" type="button">
+          <span aria-hidden="true">◉</span>
+          <span id="camera-start-label">Iniciar cámara</span>
+        </button>
+        <div class="camera-note">Tu cámara solo se utiliza durante esta experiencia.</div>
+        <div class="camera-error" id="camera-error" role="alert"></div>
+      </div>
+    </div>
+
+    <div class="ar-ui">
+      <div class="ar-top">
+        <div class="brand">AG<span>117</span></div>
+        <a class="close" href="../" aria-label="Volver al sitio">×</a>
+      </div>
+      <div class="scan-guide" aria-hidden="true"></div>
+      <div class="ar-message">
+        <strong id="ar-status">Buscando propaganda</strong>
+        <span id="ar-help">Coloca la pieza completa dentro del recuadro y evita reflejos directos.</span>
+      </div>
+    </div>
+
+    <a-scene
+      mindar-image="imageTargetSrc: ./ag117-propaganda.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 4; missTolerance: 8;"
+      color-space="sRGB"
+      renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true; alpha: true;"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      loading-screen="enabled: false"
+      embedded
+    >
+      <a-assets></a-assets>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-entity light="type: ambient; intensity: 1.4; color: #fff7e8"></a-entity>
+      <a-entity light="type: directional; intensity: 2.2; color: #fff0cc" position="-1 2 1"></a-entity>
+
+      <a-entity id="image-target" mindar-image-target="targetIndex: 0">
+        <a-entity id="ag117-model" position="0 0 0.025" rotation="90 0 0" scale="0.035 0.035 0.035"></a-entity>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      const model = document.querySelector('#ag117-model')
+      const target = document.querySelector('#image-target')
+      const status = document.querySelector('#ar-status')
+      const help = document.querySelector('#ar-help')
+      const scene = document.querySelector('a-scene')
+      const startScreen = document.querySelector('#ar-start')
+      const startButton = document.querySelector('#camera-start')
+      const startLabel = document.querySelector('#camera-start-label')
+      const cameraError = document.querySelector('#camera-error')
+
+      const box = (
+        { x = 0, y = 0, z = 0, width = 1, height = 1, depth = 1, color = '#ded8ca' },
+        parent = model,
+      ) => {
+        const element = document.createElement('a-box')
+        element.setAttribute('position', `${x} ${y} ${z}`)
+        element.setAttribute('width', width)
+        element.setAttribute('height', height)
+        element.setAttribute('depth', depth)
+        element.setAttribute('color', color)
+        element.setAttribute('shadow', 'cast: true; receive: true')
+        parent.appendChild(element)
+        return element
+      }
+
+      const wing = ({ x, z, width, depth, units, rotation = 0, base = '#48615a' }) => {
+        const group = document.createElement('a-entity')
+        group.setAttribute('position', `${x} 0 ${z}`)
+        group.setAttribute('rotation', `0 ${rotation} 0`)
+        model.appendChild(group)
+
+        const add = (data) => box(data, group)
+
+        add({ y: .7, width, height: 1.4, depth, color: '#e7e1d5' })
+        const bay = width / units
+
+        for (let floor = 1; floor <= 3; floor += 1) {
+          const y = 1.55 + floor * 1.35
+          add({ y, width, height: 1.22, depth, color: '#ded8ca' })
+          add({ y: y - .64, z: depth / 2 + .48, width: width + .18, height: .12, depth: .95, color: '#d7d0c2' })
+          add({ y: y - .39, z: depth / 2 + .91, width, height: .48, depth: .08, color: '#748047' })
+
+          for (let unit = 0; unit < units; unit += 1) {
+            const unitX = -width / 2 + bay / 2 + unit * bay
+            add({ x: unitX, y, z: depth / 2 + .05, width: bay - .16, height: 1.02, depth: .07, color: '#11622f' })
+            add({ x: unitX - bay * .2, y, z: depth / 2 + .11, width: bay * .3, height: .95, depth: .05, color: '#49645e' })
+            add({ x: unitX, y: y - .47, z: depth / 2 + .75, width: .62, height: .09, depth: .38, color: '#8e6b48' })
+          }
+        }
+
+        add({ y: 6, width: width + .1, height: .14, depth: depth + .1, color: '#ddd7ca' })
+        for (let unit = 0; unit <= units; unit += 1) {
+          const unitX = -width / 2 + unit * bay
+          add({ x: unitX, y: 6.68, z: -.1, width: .1, height: 1.35, depth: depth - .4, color: '#c9c7c3' })
+        }
+        for (let unit = 0; unit < units; unit += 2) {
+          const unitX = -width / 2 + bay / 2 + unit * bay
+          for (let rail = -2; rail <= 2; rail += 1) {
+            add({ x: unitX, y: 7.18, z: .3 + rail * .27, width: bay * .62, height: .05, depth: .045, color: '#394640' })
+          }
+        }
+      }
+
+      box({ y: -.36, width: 30, height: .7, depth: 18, color: '#bdbbb4' })
+      box({ y: .02, width: 24, height: .08, depth: 6.2, color: '#73815d' })
+      box({ y: .08, width: 2.1, height: .08, depth: 5.6, color: '#d5cbb9' })
+      wing({ x: -6.5, z: 5.8, width: 11.8, depth: 4, units: 4, rotation: 180 })
+      wing({ x: 6.5, z: 5.8, width: 11.8, depth: 4, units: 4, rotation: 180 })
+      wing({ x: 6.5, z: -5.8, width: 11.8, depth: 4, units: 4 })
+      wing({ x: -6.5, z: -5.8, width: 11.8, depth: 4, units: 4 })
+      wing({ x: -14.3, z: 1.8, width: 9.6, depth: 4.4, units: 3, rotation: 90, base: '#61716b' })
+
+      ;[-8, -4, 4, 8].forEach((x, index) => {
+        box({ x, y: .25, z: index % 2 ? -1.25 : 1.25, width: 1.4, height: .22, depth: .48, color: '#836d51' })
+      })
+
+      const showCameraError = (message) => {
+        startButton.disabled = false
+        startLabel.textContent = 'Intentar de nuevo'
+        cameraError.textContent = message
+        cameraError.classList.add('is-visible')
+      }
+
+      startButton.addEventListener('click', () => {
+        cameraError.classList.remove('is-visible')
+
+        if (!window.isSecureContext) {
+          showCameraError('La cámara requiere una conexión HTTPS. Abre la experiencia desde GitHub Pages, no desde un archivo local.')
+          return
+        }
+
+        if (!navigator.mediaDevices?.getUserMedia) {
+          showCameraError('Este navegador no permite acceder a la cámara. Prueba con Chrome, Safari o Edge actualizado.')
+          return
+        }
+
+        const arSystem = scene.systems['mindar-image-system']
+        if (!arSystem) {
+          showCameraError('La experiencia todavía no termina de cargar. Revisa tu conexión e inténtalo nuevamente.')
+          return
+        }
+
+        startButton.disabled = true
+        startLabel.textContent = 'Activando cámara...'
+        status.textContent = 'Preparando experiencia'
+        arSystem.start()
+      })
+
+      scene.addEventListener('arReady', () => {
+        document.body.classList.add('is-started')
+        startScreen.classList.add('is-hidden')
+        status.textContent = 'Buscando propaganda'
+        help.textContent = 'Coloca la pieza completa dentro del recuadro y evita reflejos directos.'
+      })
+
+      scene.addEventListener('arError', () => {
+        showCameraError('No pudimos abrir la cámara. Autoriza el permiso en la barra del navegador y vuelve a intentarlo.')
+      })
+
+      target.addEventListener('targetFound', () => {
+        document.body.classList.add('is-tracking')
+        status.textContent = 'AG117 detectado'
+        help.textContent = 'Muévete alrededor de la propaganda para descubrir el conjunto.'
+      })
+      target.addEventListener('targetLost', () => {
+        document.body.classList.remove('is-tracking')
+        status.textContent = 'Buscando propaganda'
+        help.textContent = 'Coloca la pieza completa dentro del recuadro y evita reflejos directos.'
+      })
+    </script>
+  </body>
+</html>
