@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import './App.css'
+import { translateDocument } from './pageTranslations.js'
 
 const Project3D = lazy(() => import('./Project3D.jsx'))
 
@@ -133,6 +134,9 @@ function CameraIcon() {
 }
 
 function App() {
+  const [language, setLanguage] = useState(() => (
+    localStorage.getItem('ag117-language') === 'en' ? 'en' : 'es'
+  ))
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeResidence, setActiveResidence] = useState(0)
   const [activeGallery, setActiveGallery] = useState(0)
@@ -153,6 +157,34 @@ function App() {
     document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el))
     return () => observer.disconnect()
   }, [])
+
+  useEffect(() => {
+    document.documentElement.lang = language
+    document.title = language === 'en'
+      ? 'AG117 | Architecture for a more natural life'
+      : 'AG117 | Arquitectura para una vida más natural'
+    localStorage.setItem('ag117-language', language)
+    localStorage.setItem('ag117-ar-language', language)
+
+    let frame = 0
+    const translatePage = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => translateDocument(document.body, language))
+    }
+
+    translatePage()
+    const observer = new MutationObserver(translatePage)
+    observer.observe(document.body, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    })
+
+    return () => {
+      cancelAnimationFrame(frame)
+      observer.disconnect()
+    }
+  }, [language])
 
   const tiltHero = (event) => {
     if (!heroCard.current || window.matchMedia('(pointer: coarse)').matches) return
@@ -194,6 +226,14 @@ function App() {
         <a className="header-cta" href="#contacto">
           Conocer el proyecto <Arrow />
         </a>
+        <button
+          className="site-language-toggle"
+          type="button"
+          aria-label="Cambiar idioma"
+          onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+        >
+          {language === 'es' ? 'EN' : 'ES'}
+        </button>
         <button
           className="menu-button"
           type="button"
@@ -297,12 +337,12 @@ function App() {
           <p className="eyebrow light">AG117 cobra vida</p>
           <h2>Apunta. Descubre. Recorre.</h2>
           <p>
-            Usa la cámara de tu celular o computadora. Cuando la propaganda
-            sea reconocida, la maqueta aparecerá directamente sobre ella.
+            Usa la cámara de tu celular o computadora. La maqueta aparecerá
+            únicamente al reconocer la propaganda con el sello de Ivonne.
           </p>
           <div className="ar-steps">
             <span><strong>01</strong> Abre la cámara</span>
-            <span><strong>02</strong> Apunta a la propaganda</span>
+            <span><strong>02</strong> Apunta al sello de Ivonne</span>
             <span><strong>03</strong> Explora AG117</span>
           </div>
           <a
@@ -318,16 +358,16 @@ function App() {
           </a>
           <p className="ar-compatibility">
             Requiere permiso de cámara y conexión HTTPS. Para mejores resultados,
-            evita reflejos y mantén visible la propaganda completa.
+            evita reflejos y mantén visible el sello completo.
           </p>
         </div>
         <div className="ar-target-preview" data-reveal>
           <img
-            src={publicAsset('ar/ag117-propaganda.jpeg')}
-            alt="Propaganda AG117 utilizada para activar la realidad aumentada"
+            src={publicAsset('ar/ag117-sello.jpeg')}
+            alt="Sello de Ivonne y AG117 utilizado para activar la realidad aumentada"
           />
           <div className="ar-scan-corners" aria-hidden="true" />
-          <span className="ar-preview-label">Imagen de reconocimiento</span>
+          <span className="ar-preview-label">Sello de reconocimiento</span>
           <span className="ar-live-badge"><i /> Cámara AR</span>
         </div>
       </section>

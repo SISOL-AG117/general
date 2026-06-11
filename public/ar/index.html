@@ -144,8 +144,8 @@
         background: rgba(16,45,37,.88);
         border: 1px solid rgba(255,255,255,.18);
         border-radius: 18px;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(4, 44px);
         gap: 6px;
         opacity: 0;
         padding: 8px;
@@ -172,7 +172,6 @@
         width: 44px;
       }
       .model-controls button:active { background: #d7ff52; color: #102d25; }
-      .control-divider { background: rgba(255,255,255,.18); height: 1px; margin: 2px 0; width: 28px; }
       .gesture-hint {
         background: rgba(16,45,37,.78);
         border-radius: 999px;
@@ -196,13 +195,11 @@
       @media (max-width: 640px) {
         .model-controls {
           bottom: max(104px, calc(env(safe-area-inset-bottom) + 94px));
-          flex-direction: row;
           left: 50%;
           right: auto;
           top: auto;
           transform: translateX(-50%);
         }
-        .control-divider { height: 28px; margin: 0 2px; width: 1px; }
         .ar-message { bottom: max(18px, env(safe-area-inset-bottom)); }
       }
     </style>
@@ -214,8 +211,8 @@
         <span class="ar-start-kicker" data-i18n="startKicker">Experiencia inmersiva AG117</span>
         <h1 data-i18n="startTitle">Haz que la maqueta cobre vida.</h1>
         <p data-i18n="startDescription">
-          Permite el acceso a la cámara y apunta a la propaganda completa.
-          La maqueta aparecerá directamente sobre la imagen.
+          Permite el acceso a la cámara y apunta al sello de Ivonne.
+          La maqueta solo aparecerá cuando ese sello sea reconocido.
         </p>
         <button class="camera-start" id="camera-start" type="button">
           <span aria-hidden="true">◉</span>
@@ -237,17 +234,21 @@
       <div class="scan-guide" aria-hidden="true"></div>
       <div class="gesture-hint" data-i18n="gestureHint">Arrastra para girar · Pellizca para acercar</div>
       <div class="model-controls" aria-label="Controles de la maqueta">
+        <button id="move-up" type="button" aria-label="Mover arriba">&#8593;</button>
+        <button id="move-down" type="button" aria-label="Mover abajo">&#8595;</button>
+        <button id="move-left" type="button" aria-label="Mover a la izquierda">&#8592;</button>
+        <button id="move-right" type="button" aria-label="Mover a la derecha">&#8594;</button>
         <button id="rotate-left" type="button" aria-label="Girar a la izquierda">&#8634;</button>
         <button id="rotate-right" type="button" aria-label="Girar a la derecha">&#8635;</button>
-        <span class="control-divider"></span>
+        <button id="tilt-up" type="button" aria-label="Inclinar arriba">&#8679;</button>
+        <button id="tilt-down" type="button" aria-label="Inclinar abajo">&#8681;</button>
         <button id="zoom-in" type="button" aria-label="Acercar">+</button>
         <button id="zoom-out" type="button" aria-label="Alejar">&minus;</button>
-        <span class="control-divider"></span>
         <button id="reset-model" type="button" aria-label="Restablecer">&#8962;</button>
       </div>
       <div class="ar-message">
-        <strong id="ar-status">Buscando propaganda</strong>
-        <span id="ar-help">Coloca la pieza completa dentro del recuadro y evita reflejos directos.</span>
+        <strong id="ar-status">Buscando sello de Ivonne</strong>
+        <span id="ar-help">Coloca el sello completo dentro del recuadro.</span>
       </div>
     </div>
 
@@ -283,6 +284,12 @@
       const languageButtons = document.querySelectorAll('.language-toggle')
       const rotateLeftButton = document.querySelector('#rotate-left')
       const rotateRightButton = document.querySelector('#rotate-right')
+      const moveUpButton = document.querySelector('#move-up')
+      const moveDownButton = document.querySelector('#move-down')
+      const moveLeftButton = document.querySelector('#move-left')
+      const moveRightButton = document.querySelector('#move-right')
+      const tiltUpButton = document.querySelector('#tilt-up')
+      const tiltDownButton = document.querySelector('#tilt-down')
       const zoomInButton = document.querySelector('#zoom-in')
       const zoomOutButton = document.querySelector('#zoom-out')
       const resetButton = document.querySelector('#reset-model')
@@ -297,6 +304,8 @@
       let modelZoom = 1
       let modelYaw = 0
       let modelTilt = 0
+      let modelX = 0
+      let modelY = 0
       let dragging = false
       let pointerX = 0
       let pointerY = 0
@@ -307,19 +316,19 @@
         es: {
           startKicker: 'Experiencia inmersiva AG117',
           startTitle: 'Haz que la maqueta cobre vida.',
-          startDescription: 'Permite el acceso a la cámara y apunta a la propaganda completa. La maqueta aparecerá directamente sobre la imagen.',
+          startDescription: 'Permite el acceso a la cámara y apunta al sello de Ivonne. La maqueta solo aparecerá cuando ese sello sea reconocido.',
           startCamera: 'Iniciar cámara',
           cameraNote: 'Tu cámara solo se utiliza durante esta experiencia.',
           retry: 'Intentar de nuevo',
           activating: 'Activando cámara...',
           preparing: 'Preparando experiencia',
-          searching: 'Buscando propaganda',
-          scanHelp: 'Coloca la pieza completa dentro del recuadro y evita reflejos directos.',
+          searching: 'Buscando sello de Ivonne',
+          scanHelp: 'Coloca el sello completo dentro del recuadro. La propaganda sin este sello no activará la maqueta.',
           detected: 'AG117 detectado',
-          detectedHelp: 'Arrastra para girar y pellizca para acercar la maqueta.',
+          detectedHelp: 'Arrastra para girar, pellizca para acercar y usa las flechas para mover la maqueta.',
           persistent: 'Exploración libre activa',
-          persistentHelp: 'La maqueta permanecerá visible durante 3 minutos. Vuelve a apuntar para recalibrarla.',
-          gestureHint: 'Arrastra para girar · Pellizca para acercar',
+          persistentHelp: 'La maqueta permanecerá visible durante 3 minutos. Vuelve a apuntar al sello para recalibrarla.',
+          gestureHint: 'Arrastra: rotar · Pellizca: zoom · Flechas: mover',
           insecure: 'La cámara requiere una conexión HTTPS. Abre la experiencia desde GitHub Pages, no desde un archivo local.',
           unsupported: 'Este navegador no permite acceder a la cámara. Prueba con Chrome, Safari o Edge actualizado.',
           loading: 'La experiencia todavía no termina de cargar. Revisa tu conexión e inténtalo nuevamente.',
@@ -328,19 +337,19 @@
         en: {
           startKicker: 'AG117 immersive experience',
           startTitle: 'Bring the model to life.',
-          startDescription: 'Allow camera access and point at the complete brochure. The architectural model will appear directly over the image.',
+          startDescription: 'Allow camera access and point at Ivonne’s stamp. The model will appear only when that stamp is recognized.',
           startCamera: 'Start camera',
           cameraNote: 'Your camera is only used during this experience.',
           retry: 'Try again',
           activating: 'Starting camera...',
           preparing: 'Preparing experience',
-          searching: 'Looking for the brochure',
-          scanHelp: 'Keep the complete image inside the frame and avoid direct reflections.',
+          searching: 'Looking for Ivonne’s stamp',
+          scanHelp: 'Keep the complete stamp inside the frame. A brochure without this stamp will not activate the model.',
           detected: 'AG117 detected',
-          detectedHelp: 'Drag to rotate and pinch to zoom the model.',
+          detectedHelp: 'Drag to rotate, pinch to zoom and use the arrows to move the model.',
           persistent: 'Free exploration active',
-          persistentHelp: 'The model will remain visible for 3 minutes. Point at the brochure again to recalibrate it.',
-          gestureHint: 'Drag to rotate · Pinch to zoom',
+          persistentHelp: 'The model will remain visible for 3 minutes. Point at the stamp again to recalibrate it.',
+          gestureHint: 'Drag: rotate · Pinch: zoom · Arrows: move',
           insecure: 'Camera access requires HTTPS. Open this experience through GitHub Pages, not as a local file.',
           unsupported: 'This browser cannot access the camera. Try an updated version of Chrome, Safari or Edge.',
           loading: 'The experience is still loading. Check your connection and try again.',
@@ -386,17 +395,26 @@
         const scale = BASE_SCALE * modelZoom
         model.setAttribute('scale', `${scale} ${scale} ${scale}`)
         model.setAttribute('rotation', `${90 + modelTilt} ${modelYaw} 0`)
+        model.setAttribute('position', `${modelX} ${modelY} 0.025`)
       }
 
       const resetModel = () => {
         modelZoom = 1
         modelYaw = 0
         modelTilt = 0
+        modelX = 0
+        modelY = 0
         applyModelTransform()
       }
 
       const changeZoom = (amount) => {
         modelZoom = Math.min(2.4, Math.max(.55, modelZoom + amount))
+        applyModelTransform()
+      }
+
+      const moveModel = (x, y) => {
+        modelX = Math.min(.65, Math.max(-.65, modelX + x))
+        modelY = Math.min(.65, Math.max(-.65, modelY + y))
         applyModelTransform()
       }
 
@@ -477,12 +495,13 @@
       languageButtons.forEach((button) => {
         button.addEventListener('click', () => {
           language = language === 'es' ? 'en' : 'es'
+          localStorage.setItem('ag117-language', language)
           localStorage.setItem('ag117-ar-language', language)
           updateInterface()
         })
       })
 
-      const savedLanguage = localStorage.getItem('ag117-ar-language')
+      const savedLanguage = localStorage.getItem('ag117-language') || localStorage.getItem('ag117-ar-language')
       if (savedLanguage === 'en') language = 'en'
       updateInterface()
 
@@ -572,6 +591,18 @@
         modelYaw += 15
         applyModelTransform()
       })
+      tiltUpButton.addEventListener('click', () => {
+        modelTilt = Math.min(45, modelTilt + 10)
+        applyModelTransform()
+      })
+      tiltDownButton.addEventListener('click', () => {
+        modelTilt = Math.max(-45, modelTilt - 10)
+        applyModelTransform()
+      })
+      moveUpButton.addEventListener('click', () => moveModel(0, .08))
+      moveDownButton.addEventListener('click', () => moveModel(0, -.08))
+      moveLeftButton.addEventListener('click', () => moveModel(-.08, 0))
+      moveRightButton.addEventListener('click', () => moveModel(.08, 0))
       zoomInButton.addEventListener('click', () => changeZoom(.15))
       zoomOutButton.addEventListener('click', () => changeZoom(-.15))
       resetButton.addEventListener('click', resetModel)
@@ -595,8 +626,8 @@
           const deltaY = event.clientY - pointerY
           pointerX = event.clientX
           pointerY = event.clientY
-          modelYaw += deltaX * .45
-          modelTilt = Math.min(35, Math.max(-35, modelTilt - deltaY * .25))
+          modelYaw += deltaX * .7
+          modelTilt = Math.min(45, Math.max(-45, modelTilt - deltaY * .4))
           applyModelTransform()
         })
 
@@ -630,6 +661,25 @@
         }, { passive: false })
 
         canvas.addEventListener('touchend', () => { pinchDistance = 0 })
+        canvas.addEventListener('dblclick', resetModel)
+      })
+
+      window.addEventListener('keydown', (event) => {
+        if (!document.body.classList.contains('has-model')) return
+        const actions = {
+          ArrowUp: () => moveModel(0, .08),
+          ArrowDown: () => moveModel(0, -.08),
+          ArrowLeft: () => moveModel(-.08, 0),
+          ArrowRight: () => moveModel(.08, 0),
+          '+': () => changeZoom(.15),
+          '-': () => changeZoom(-.15),
+          r: resetModel,
+          R: resetModel,
+        }
+        if (actions[event.key]) {
+          event.preventDefault()
+          actions[event.key]()
+        }
       })
     </script>
   </body>

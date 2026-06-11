@@ -56,7 +56,8 @@ svg {
   align-items: center;
   color: white;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  grid-template-columns: 1fr auto 1fr auto;
   left: 0;
   padding: 24px clamp(24px, 4vw, 64px);
   position: absolute;
@@ -131,6 +132,25 @@ svg {
 
 .header-cta svg {
   color: var(--lime);
+}
+
+.site-language-toggle {
+  background: rgba(16, 45, 37, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  min-height: 40px;
+  padding: 0 15px;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.site-language-toggle:hover {
+  background: var(--lime);
+  color: var(--deep);
 }
 
 .menu-button {
@@ -2072,7 +2092,8 @@ footer > p {
   }
 
   .site-header {
-    grid-template-columns: 1fr auto;
+    gap: 10px;
+    grid-template-columns: 1fr auto auto;
     padding: 20px 22px;
   }
 
