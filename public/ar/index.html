@@ -184,6 +184,34 @@
         width: 44px;
       }
       .model-controls button:active { background: #d7ff52; color: #102d25; }
+      .controls-toggle {
+        align-items: center;
+        background: rgba(16,45,37,.9);
+        border: 1px solid rgba(255,255,255,.22);
+        border-radius: 999px;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        font: inherit;
+        font-size: .64rem;
+        font-weight: 700;
+        gap: 8px;
+        letter-spacing: .05em;
+        opacity: 0;
+        padding: 10px 13px;
+        pointer-events: none;
+        position: absolute;
+        right: 18px;
+        top: max(82px, calc(env(safe-area-inset-top) + 68px));
+        transition: background .2s ease, opacity .25s ease;
+        z-index: 31;
+      }
+      .controls-toggle::before {
+        content: '☷';
+        font-size: 1rem;
+        line-height: 1;
+      }
+      .controls-toggle:active { background: #d7ff52; color: #102d25; }
       .gesture-hint {
         background: rgba(16,45,37,.78);
         border-radius: 999px;
@@ -201,7 +229,8 @@
       body.is-tracking .ar-message { background: rgba(16,45,37,.72); }
       body.is-started .scan-guide, body.is-started .ar-message { opacity: 1; }
       body.is-started.is-tracking .scan-guide { opacity: 0; }
-      body.has-model .model-controls, body.has-model .gesture-hint { opacity: 1; pointer-events: auto; }
+      body.has-model .model-controls, body.has-model .gesture-hint, body.has-model .controls-toggle { opacity: 1; pointer-events: auto; }
+      body.controls-hidden .model-controls, body.controls-hidden .gesture-hint { opacity: 0; pointer-events: none; }
       body.is-persisting .scan-guide { opacity: 0; }
       .mindar-ui-overlay { z-index: 8 !important; }
       @media (max-width: 640px) {
@@ -224,6 +253,10 @@
           width: auto;
         }
         .model-controls button { height: 42px; width: 100%; }
+        .controls-toggle {
+          right: 14px;
+          top: max(78px, calc(env(safe-area-inset-top) + 64px));
+        }
         .ar-message { bottom: max(18px, env(safe-area-inset-bottom)); }
       }
     </style>
@@ -257,6 +290,7 @@
       </div>
       <div class="scan-guide" aria-hidden="true"></div>
       <div class="gesture-hint" data-i18n="gestureHint">Arrastra para girar · Pellizca para acercar</div>
+      <button class="controls-toggle" id="controls-toggle" type="button" data-i18n="hideControls">Ocultar controles</button>
       <div class="model-controls" aria-label="Controles de la maqueta">
         <button id="move-up" type="button" aria-label="Mover arriba">&#8593;</button>
         <button id="move-down" type="button" aria-label="Mover abajo">&#8595;</button>
@@ -317,6 +351,7 @@
       const zoomInButton = document.querySelector('#zoom-in')
       const zoomOutButton = document.querySelector('#zoom-out')
       const resetButton = document.querySelector('#reset-model')
+      const controlsToggle = document.querySelector('#controls-toggle')
 
       const PERSISTENCE_TIME = 3 * 60 * 1000
       const BASE_SCALE = 0.035
@@ -371,6 +406,8 @@
           persistent: 'Exploración libre activa',
           persistentHelp: 'La maqueta permanecerá visible durante 3 minutos. Vuelve a apuntar al sello para recalibrarla.',
           gestureHint: 'Arrastra: rotar · Pellizca: zoom · Flechas: mover',
+          hideControls: 'Ocultar controles',
+          showControls: 'Mostrar controles',
           insecure: 'La cámara requiere una conexión HTTPS. Abre la experiencia desde GitHub Pages, no desde un archivo local.',
           unsupported: 'Este navegador no permite acceder a la cámara. Prueba con Chrome, Safari o Edge actualizado.',
           loading: 'La experiencia todavía no termina de cargar. Revisa tu conexión e inténtalo nuevamente.',
@@ -392,6 +429,8 @@
           persistent: 'Free exploration active',
           persistentHelp: 'The model will remain visible for 3 minutes. Point at the stamp again to recalibrate it.',
           gestureHint: 'Drag: rotate · Pinch: zoom · Arrows: move',
+          hideControls: 'Hide controls',
+          showControls: 'Show controls',
           insecure: 'Camera access requires HTTPS. Open this experience through GitHub Pages, not as a local file.',
           unsupported: 'This browser cannot access the camera. Try an updated version of Chrome, Safari or Edge.',
           loading: 'The experience is still loading. Check your connection and try again.',
@@ -409,6 +448,9 @@
         document.querySelectorAll('[data-i18n]').forEach((element) => {
           element.textContent = text(element.dataset.i18n)
         })
+        controlsToggle.textContent = text(
+          document.body.classList.contains('controls-hidden') ? 'showControls' : 'hideControls',
+        )
 
         if (interfaceState === 'searching') {
           status.textContent = text('searching')
@@ -651,6 +693,12 @@
       zoomInButton.addEventListener('click', () => changeZoom(.15))
       zoomOutButton.addEventListener('click', () => changeZoom(-.15))
       resetButton.addEventListener('click', resetModel)
+      controlsToggle.addEventListener('click', () => {
+        document.body.classList.toggle('controls-hidden')
+        controlsToggle.textContent = text(
+          document.body.classList.contains('controls-hidden') ? 'showControls' : 'hideControls',
+        )
+      })
 
       scene.addEventListener('renderstart', () => {
         const canvas = scene.canvas
