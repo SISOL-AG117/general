@@ -75,8 +75,23 @@
         justify-content: space-between;
         padding: max(18px, env(safe-area-inset-top)) 18px 0;
       }
+      .ar-actions { align-items: center; display: flex; gap: 9px; pointer-events: auto; }
       .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: -.08em; }
       .brand span { color: #d7ff52; font-size: .78rem; margin-left: 3px; }
+      .language-toggle {
+        background: rgba(16, 45, 37, .86);
+        border: 1px solid rgba(255,255,255,.25);
+        border-radius: 999px;
+        color: white;
+        cursor: pointer;
+        font: inherit;
+        font-size: .7rem;
+        font-weight: 700;
+        height: 44px;
+        letter-spacing: .08em;
+        padding: 0 16px;
+      }
+      .ar-start .language-toggle { margin-bottom: 22px; }
       .close {
         align-items: center;
         background: rgba(16, 45, 37, .86);
@@ -124,27 +139,89 @@
       }
       .ar-message strong { color: #d7ff52; display: block; font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; }
       .ar-message span { display: block; font-size: .78rem; line-height: 1.45; margin-top: 5px; opacity: .72; }
+      .model-controls {
+        align-items: center;
+        background: rgba(16,45,37,.88);
+        border: 1px solid rgba(255,255,255,.18);
+        border-radius: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        opacity: 0;
+        padding: 8px;
+        pointer-events: none;
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: opacity .25s ease;
+      }
+      .model-controls button {
+        align-items: center;
+        background: rgba(255,255,255,.08);
+        border: 0;
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        font: inherit;
+        font-size: 1.05rem;
+        height: 44px;
+        justify-content: center;
+        pointer-events: auto;
+        width: 44px;
+      }
+      .model-controls button:active { background: #d7ff52; color: #102d25; }
+      .control-divider { background: rgba(255,255,255,.18); height: 1px; margin: 2px 0; width: 28px; }
+      .gesture-hint {
+        background: rgba(16,45,37,.78);
+        border-radius: 999px;
+        font-size: .66rem;
+        left: 50%;
+        opacity: 0;
+        padding: 9px 14px;
+        position: absolute;
+        top: max(82px, calc(env(safe-area-inset-top) + 68px));
+        transform: translateX(-50%);
+        transition: opacity .25s ease;
+        white-space: nowrap;
+      }
       body.is-tracking .scan-guide { opacity: 0; }
       body.is-tracking .ar-message { background: rgba(16,45,37,.72); }
       body.is-started .scan-guide, body.is-started .ar-message { opacity: 1; }
       body.is-started.is-tracking .scan-guide { opacity: 0; }
+      body.has-model .model-controls, body.has-model .gesture-hint { opacity: 1; pointer-events: auto; }
+      body.is-persisting .scan-guide { opacity: 0; }
       .mindar-ui-overlay { z-index: 8 !important; }
+      @media (max-width: 640px) {
+        .model-controls {
+          bottom: max(104px, calc(env(safe-area-inset-bottom) + 94px));
+          flex-direction: row;
+          left: 50%;
+          right: auto;
+          top: auto;
+          transform: translateX(-50%);
+        }
+        .control-divider { height: 28px; margin: 0 2px; width: 1px; }
+        .ar-message { bottom: max(18px, env(safe-area-inset-bottom)); }
+      }
     </style>
   </head>
   <body>
     <div class="ar-start" id="ar-start">
       <div class="ar-start-card">
-        <span class="ar-start-kicker">Experiencia inmersiva AG117</span>
-        <h1>Haz que la maqueta cobre vida.</h1>
-        <p>
+        <button class="language-toggle" type="button" aria-label="Cambiar idioma">EN</button>
+        <span class="ar-start-kicker" data-i18n="startKicker">Experiencia inmersiva AG117</span>
+        <h1 data-i18n="startTitle">Haz que la maqueta cobre vida.</h1>
+        <p data-i18n="startDescription">
           Permite el acceso a la cámara y apunta a la propaganda completa.
           La maqueta aparecerá directamente sobre la imagen.
         </p>
         <button class="camera-start" id="camera-start" type="button">
           <span aria-hidden="true">◉</span>
-          <span id="camera-start-label">Iniciar cámara</span>
+          <span id="camera-start-label" data-i18n="startCamera">Iniciar cámara</span>
         </button>
-        <div class="camera-note">Tu cámara solo se utiliza durante esta experiencia.</div>
+        <div class="camera-note" data-i18n="cameraNote">Tu cámara solo se utiliza durante esta experiencia.</div>
         <div class="camera-error" id="camera-error" role="alert"></div>
       </div>
     </div>
@@ -152,9 +229,22 @@
     <div class="ar-ui">
       <div class="ar-top">
         <div class="brand">AG<span>117</span></div>
-        <a class="close" href="../" aria-label="Volver al sitio">×</a>
+        <div class="ar-actions">
+          <button class="language-toggle" id="language-toggle" type="button" aria-label="Cambiar idioma">EN</button>
+          <a class="close" href="../" aria-label="Volver al sitio">×</a>
+        </div>
       </div>
       <div class="scan-guide" aria-hidden="true"></div>
+      <div class="gesture-hint" data-i18n="gestureHint">Arrastra para girar · Pellizca para acercar</div>
+      <div class="model-controls" aria-label="Controles de la maqueta">
+        <button id="rotate-left" type="button" aria-label="Girar a la izquierda">&#8634;</button>
+        <button id="rotate-right" type="button" aria-label="Girar a la derecha">&#8635;</button>
+        <span class="control-divider"></span>
+        <button id="zoom-in" type="button" aria-label="Acercar">+</button>
+        <button id="zoom-out" type="button" aria-label="Alejar">&minus;</button>
+        <span class="control-divider"></span>
+        <button id="reset-model" type="button" aria-label="Restablecer">&#8962;</button>
+      </div>
       <div class="ar-message">
         <strong id="ar-status">Buscando propaganda</strong>
         <span id="ar-help">Coloca la pieza completa dentro del recuadro y evita reflejos directos.</span>
@@ -190,6 +280,125 @@
       const startButton = document.querySelector('#camera-start')
       const startLabel = document.querySelector('#camera-start-label')
       const cameraError = document.querySelector('#camera-error')
+      const languageButtons = document.querySelectorAll('.language-toggle')
+      const rotateLeftButton = document.querySelector('#rotate-left')
+      const rotateRightButton = document.querySelector('#rotate-right')
+      const zoomInButton = document.querySelector('#zoom-in')
+      const zoomOutButton = document.querySelector('#zoom-out')
+      const resetButton = document.querySelector('#reset-model')
+
+      const PERSISTENCE_TIME = 3 * 60 * 1000
+      const BASE_SCALE = 0.035
+      let language = 'es'
+      let interfaceState = 'idle'
+      let lastWorldMatrix = null
+      let lastTrackedAt = 0
+      let isMarkerVisible = false
+      let modelZoom = 1
+      let modelYaw = 0
+      let modelTilt = 0
+      let dragging = false
+      let pointerX = 0
+      let pointerY = 0
+      let pinchDistance = 0
+      let currentErrorKey = null
+
+      const translations = {
+        es: {
+          startKicker: 'Experiencia inmersiva AG117',
+          startTitle: 'Haz que la maqueta cobre vida.',
+          startDescription: 'Permite el acceso a la cámara y apunta a la propaganda completa. La maqueta aparecerá directamente sobre la imagen.',
+          startCamera: 'Iniciar cámara',
+          cameraNote: 'Tu cámara solo se utiliza durante esta experiencia.',
+          retry: 'Intentar de nuevo',
+          activating: 'Activando cámara...',
+          preparing: 'Preparando experiencia',
+          searching: 'Buscando propaganda',
+          scanHelp: 'Coloca la pieza completa dentro del recuadro y evita reflejos directos.',
+          detected: 'AG117 detectado',
+          detectedHelp: 'Arrastra para girar y pellizca para acercar la maqueta.',
+          persistent: 'Exploración libre activa',
+          persistentHelp: 'La maqueta permanecerá visible durante 3 minutos. Vuelve a apuntar para recalibrarla.',
+          gestureHint: 'Arrastra para girar · Pellizca para acercar',
+          insecure: 'La cámara requiere una conexión HTTPS. Abre la experiencia desde GitHub Pages, no desde un archivo local.',
+          unsupported: 'Este navegador no permite acceder a la cámara. Prueba con Chrome, Safari o Edge actualizado.',
+          loading: 'La experiencia todavía no termina de cargar. Revisa tu conexión e inténtalo nuevamente.',
+          denied: 'No pudimos abrir la cámara. Autoriza el permiso en la barra del navegador y vuelve a intentarlo.',
+        },
+        en: {
+          startKicker: 'AG117 immersive experience',
+          startTitle: 'Bring the model to life.',
+          startDescription: 'Allow camera access and point at the complete brochure. The architectural model will appear directly over the image.',
+          startCamera: 'Start camera',
+          cameraNote: 'Your camera is only used during this experience.',
+          retry: 'Try again',
+          activating: 'Starting camera...',
+          preparing: 'Preparing experience',
+          searching: 'Looking for the brochure',
+          scanHelp: 'Keep the complete image inside the frame and avoid direct reflections.',
+          detected: 'AG117 detected',
+          detectedHelp: 'Drag to rotate and pinch to zoom the model.',
+          persistent: 'Free exploration active',
+          persistentHelp: 'The model will remain visible for 3 minutes. Point at the brochure again to recalibrate it.',
+          gestureHint: 'Drag to rotate · Pinch to zoom',
+          insecure: 'Camera access requires HTTPS. Open this experience through GitHub Pages, not as a local file.',
+          unsupported: 'This browser cannot access the camera. Try an updated version of Chrome, Safari or Edge.',
+          loading: 'The experience is still loading. Check your connection and try again.',
+          denied: 'We could not open the camera. Allow camera access in the browser bar and try again.',
+        },
+      }
+
+      const text = (key) => translations[language][key]
+
+      const updateInterface = () => {
+        document.documentElement.lang = language
+        languageButtons.forEach((button) => {
+          button.textContent = language === 'es' ? 'EN' : 'ES'
+        })
+        document.querySelectorAll('[data-i18n]').forEach((element) => {
+          element.textContent = text(element.dataset.i18n)
+        })
+
+        if (interfaceState === 'searching') {
+          status.textContent = text('searching')
+          help.textContent = text('scanHelp')
+        } else if (interfaceState === 'detected') {
+          status.textContent = text('detected')
+          help.textContent = text('detectedHelp')
+        } else if (interfaceState === 'persistent') {
+          status.textContent = text('persistent')
+          help.textContent = text('persistentHelp')
+        } else if (interfaceState === 'preparing') {
+          status.textContent = text('preparing')
+        }
+
+        if (currentErrorKey) {
+          cameraError.textContent = text(currentErrorKey)
+        }
+      }
+
+      const setInterfaceState = (nextState) => {
+        interfaceState = nextState
+        updateInterface()
+      }
+
+      const applyModelTransform = () => {
+        const scale = BASE_SCALE * modelZoom
+        model.setAttribute('scale', `${scale} ${scale} ${scale}`)
+        model.setAttribute('rotation', `${90 + modelTilt} ${modelYaw} 0`)
+      }
+
+      const resetModel = () => {
+        modelZoom = 1
+        modelYaw = 0
+        modelTilt = 0
+        applyModelTransform()
+      }
+
+      const changeZoom = (amount) => {
+        modelZoom = Math.min(2.4, Math.max(.55, modelZoom + amount))
+        applyModelTransform()
+      }
 
       const box = (
         { x = 0, y = 0, z = 0, width = 1, height = 1, depth = 1, color = '#ded8ca' },
@@ -257,58 +466,170 @@
         box({ x, y: .25, z: index % 2 ? -1.25 : 1.25, width: 1.4, height: .22, depth: .48, color: '#836d51' })
       })
 
-      const showCameraError = (message) => {
+      const showCameraError = (errorKey) => {
+        currentErrorKey = errorKey
         startButton.disabled = false
-        startLabel.textContent = 'Intentar de nuevo'
-        cameraError.textContent = message
+        startLabel.textContent = text('retry')
+        cameraError.textContent = text(errorKey)
         cameraError.classList.add('is-visible')
       }
 
+      languageButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          language = language === 'es' ? 'en' : 'es'
+          localStorage.setItem('ag117-ar-language', language)
+          updateInterface()
+        })
+      })
+
+      const savedLanguage = localStorage.getItem('ag117-ar-language')
+      if (savedLanguage === 'en') language = 'en'
+      updateInterface()
+
       startButton.addEventListener('click', () => {
+        currentErrorKey = null
         cameraError.classList.remove('is-visible')
 
         if (!window.isSecureContext) {
-          showCameraError('La cámara requiere una conexión HTTPS. Abre la experiencia desde GitHub Pages, no desde un archivo local.')
+          showCameraError('insecure')
           return
         }
 
         if (!navigator.mediaDevices?.getUserMedia) {
-          showCameraError('Este navegador no permite acceder a la cámara. Prueba con Chrome, Safari o Edge actualizado.')
+          showCameraError('unsupported')
           return
         }
 
         const arSystem = scene.systems['mindar-image-system']
         if (!arSystem) {
-          showCameraError('La experiencia todavía no termina de cargar. Revisa tu conexión e inténtalo nuevamente.')
+          showCameraError('loading')
           return
         }
 
         startButton.disabled = true
-        startLabel.textContent = 'Activando cámara...'
-        status.textContent = 'Preparando experiencia'
+        startLabel.textContent = text('activating')
+        setInterfaceState('preparing')
         arSystem.start()
       })
 
+      const installPersistentTracking = () => {
+        const anchor = target.components['mindar-image-target']
+        if (!anchor || anchor.persistenceInstalled) return
+
+        anchor.persistenceInstalled = true
+        const updateWorldMatrix = anchor.updateWorldMatrix.bind(anchor)
+
+        anchor.updateWorldMatrix = (worldMatrix) => {
+          const now = Date.now()
+
+          if (worldMatrix !== null) {
+            lastWorldMatrix = Array.from(worldMatrix)
+            lastTrackedAt = now
+            isMarkerVisible = true
+            document.body.classList.add('has-model', 'is-tracking')
+            document.body.classList.remove('is-persisting')
+            setInterfaceState('detected')
+            updateWorldMatrix(worldMatrix)
+            return
+          }
+
+          if (lastWorldMatrix && now - lastTrackedAt < PERSISTENCE_TIME) {
+            if (isMarkerVisible) {
+              isMarkerVisible = false
+              document.body.classList.remove('is-tracking')
+              document.body.classList.add('is-persisting')
+              setInterfaceState('persistent')
+            }
+            updateWorldMatrix(lastWorldMatrix)
+            return
+          }
+
+          if (lastWorldMatrix) {
+            lastWorldMatrix = null
+            document.body.classList.remove('has-model', 'is-tracking', 'is-persisting')
+            setInterfaceState('searching')
+          }
+          updateWorldMatrix(null)
+        }
+      }
+
       scene.addEventListener('arReady', () => {
+        installPersistentTracking()
         document.body.classList.add('is-started')
         startScreen.classList.add('is-hidden')
-        status.textContent = 'Buscando propaganda'
-        help.textContent = 'Coloca la pieza completa dentro del recuadro y evita reflejos directos.'
+        setInterfaceState('searching')
       })
 
       scene.addEventListener('arError', () => {
-        showCameraError('No pudimos abrir la cámara. Autoriza el permiso en la barra del navegador y vuelve a intentarlo.')
+        showCameraError('denied')
       })
 
-      target.addEventListener('targetFound', () => {
-        document.body.classList.add('is-tracking')
-        status.textContent = 'AG117 detectado'
-        help.textContent = 'Muévete alrededor de la propaganda para descubrir el conjunto.'
+      rotateLeftButton.addEventListener('click', () => {
+        modelYaw -= 15
+        applyModelTransform()
       })
-      target.addEventListener('targetLost', () => {
-        document.body.classList.remove('is-tracking')
-        status.textContent = 'Buscando propaganda'
-        help.textContent = 'Coloca la pieza completa dentro del recuadro y evita reflejos directos.'
+      rotateRightButton.addEventListener('click', () => {
+        modelYaw += 15
+        applyModelTransform()
+      })
+      zoomInButton.addEventListener('click', () => changeZoom(.15))
+      zoomOutButton.addEventListener('click', () => changeZoom(-.15))
+      resetButton.addEventListener('click', resetModel)
+
+      scene.addEventListener('renderstart', () => {
+        const canvas = scene.canvas
+        if (!canvas) return
+        canvas.style.touchAction = 'none'
+
+        canvas.addEventListener('pointerdown', (event) => {
+          if (!document.body.classList.contains('has-model')) return
+          dragging = true
+          pointerX = event.clientX
+          pointerY = event.clientY
+          canvas.setPointerCapture?.(event.pointerId)
+        })
+
+        canvas.addEventListener('pointermove', (event) => {
+          if (!dragging || !document.body.classList.contains('has-model')) return
+          const deltaX = event.clientX - pointerX
+          const deltaY = event.clientY - pointerY
+          pointerX = event.clientX
+          pointerY = event.clientY
+          modelYaw += deltaX * .45
+          modelTilt = Math.min(35, Math.max(-35, modelTilt - deltaY * .25))
+          applyModelTransform()
+        })
+
+        const stopDragging = () => { dragging = false }
+        canvas.addEventListener('pointerup', stopDragging)
+        canvas.addEventListener('pointercancel', stopDragging)
+
+        canvas.addEventListener('wheel', (event) => {
+          if (!document.body.classList.contains('has-model')) return
+          event.preventDefault()
+          changeZoom(event.deltaY < 0 ? .1 : -.1)
+        }, { passive: false })
+
+        canvas.addEventListener('touchstart', (event) => {
+          if (event.touches.length !== 2) return
+          pinchDistance = Math.hypot(
+            event.touches[0].clientX - event.touches[1].clientX,
+            event.touches[0].clientY - event.touches[1].clientY,
+          )
+        }, { passive: false })
+
+        canvas.addEventListener('touchmove', (event) => {
+          if (event.touches.length !== 2 || !document.body.classList.contains('has-model')) return
+          event.preventDefault()
+          const distance = Math.hypot(
+            event.touches[0].clientX - event.touches[1].clientX,
+            event.touches[0].clientY - event.touches[1].clientY,
+          )
+          if (pinchDistance) changeZoom((distance - pinchDistance) * .004)
+          pinchDistance = distance
+        }, { passive: false })
+
+        canvas.addEventListener('touchend', () => { pinchDistance = 0 })
       })
     </script>
   </body>
