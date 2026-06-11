@@ -1786,13 +1786,13 @@ svg {
   border: 1px solid rgba(255, 255, 255, 0.26);
   box-shadow: 0 24px 65px rgba(0, 0, 0, 0.34);
   color: white;
-  max-width: 280px;
+  max-width: 250px;
   opacity: 0;
   overflow: hidden;
-  padding: 25px 27px;
+  padding: 22px 24px;
   position: absolute;
-  right: 24px;
-  top: 22%;
+  right: 18px;
+  top: 22px;
   transform: translateX(45px) rotate(2deg);
   z-index: 3;
 }
@@ -1853,7 +1853,7 @@ svg {
 .advisor-exclusive strong {
   display: block;
   font-family: 'Manrope', sans-serif;
-  font-size: clamp(1.9rem, 3.2vw, 3rem);
+  font-size: clamp(1.75rem, 2.7vw, 2.55rem);
   font-weight: 300;
   letter-spacing: -0.065em;
   line-height: 0.9;
@@ -3051,11 +3051,11 @@ footer > p {
   }
 
   .advisor-exclusive {
-    bottom: 56px;
-    max-width: 245px;
-    padding: 20px 22px;
-    right: 15px;
-    top: auto;
+    bottom: auto;
+    max-width: 210px;
+    padding: 17px 18px;
+    right: 10px;
+    top: 14px;
   }
 
   .advisor-exclusive::after {
@@ -3063,7 +3063,7 @@ footer > p {
   }
 
   .advisor-exclusive strong {
-    font-size: 2.15rem;
+    font-size: 1.8rem;
   }
 
   .whatsapp-button {
