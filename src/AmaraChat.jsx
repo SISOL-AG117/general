@@ -17,6 +17,8 @@ const copy = {
     fallback: 'Todavía no cuento con información confirmada sobre eso. Para darte una respuesta precisa, puedo comunicarte con Ivonne Hernández Monroy, asesora inmobiliaria de AG117.',
     privacy: 'Amara brinda orientación general con información publicada. No solicita ni muestra documentos confidenciales.',
     advisor: 'Hablar con Ivonne',
+    topics: 'Temas',
+    hideTopics: 'Ocultar temas',
     quick: ['¿Qué es AG117?', 'Precios disponibles', 'Fecha de entrega', 'Documentos y permisos'],
   },
   en: {
@@ -33,6 +35,8 @@ const copy = {
     fallback: 'I do not have confirmed information about that yet. To give you an accurate answer, I can connect you with Ivonne Hernández Monroy, AG117 real estate advisor.',
     privacy: 'Amara provides general guidance using published information. It does not request or display confidential documents.',
     advisor: 'Talk to Ivonne',
+    topics: 'Topics',
+    hideTopics: 'Hide topics',
     quick: ['What is AG117?', 'Available prices', 'Delivery date', 'Documents and permits'],
   },
 }
@@ -139,10 +143,12 @@ const messageTime = () => new Intl.DateTimeFormat([], {
 
 export default function AmaraChat({ language }) {
   const ui = copy[language]
+  const avatar = `${import.meta.env.BASE_URL}ag117/amara-profile.svg`
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
   const [showGreeting, setShowGreeting] = useState(false)
+  const [showTopics, setShowTopics] = useState(true)
   const [messages, setMessages] = useState([
     { id: 0, role: 'amara', text: ui.welcome, time: messageTime() },
   ])
@@ -175,6 +181,7 @@ export default function AmaraChat({ language }) {
       { id: Date.now(), role: 'user', text: question, time: messageTime() },
     ])
     setInput('')
+    setShowTopics(false)
     setTyping(true)
     replyTimer.current = window.setTimeout(() => {
       setMessages((current) => [
@@ -207,7 +214,10 @@ export default function AmaraChat({ language }) {
             event.stopPropagation()
             setShowGreeting(false)
           }}>×</span>
-          <span className="amara-greeting-avatar">A<i /></span>
+          <span className="amara-greeting-avatar">
+            <img src={avatar} alt="" />
+            <i />
+          </span>
           <span>
             <strong>Amara</strong>
             <small>{ui.greeting}</small>
@@ -218,7 +228,10 @@ export default function AmaraChat({ language }) {
       {open && (
         <div className="amara-window">
           <header className="amara-header">
-            <div className="amara-avatar" aria-hidden="true">A<i /></div>
+            <div className="amara-avatar" aria-hidden="true">
+              <img src={avatar} alt="" />
+              <i />
+            </div>
             <div>
               <strong>{ui.title}</strong>
               <span>{typing ? ui.typing : `${ui.online} · ${ui.role}`}</span>
@@ -239,7 +252,7 @@ export default function AmaraChat({ language }) {
                 <i /><i /><i />
               </div>
             )}
-            {messages.length === 1 && (
+            {showTopics && (
               <div className="amara-quick">
                 <span>{language === 'en' ? 'Choose a question' : 'Elige una pregunta'}</span>
                 {ui.quick.map((question) => (
@@ -249,6 +262,15 @@ export default function AmaraChat({ language }) {
                 ))}
               </div>
             )}
+            <button
+              className="amara-topics-toggle"
+              type="button"
+              onClick={() => setShowTopics((current) => !current)}
+              aria-expanded={showTopics}
+            >
+              <span>•••</span>
+              {showTopics ? ui.hideTopics : ui.topics}
+            </button>
           </div>
 
           <a
@@ -290,7 +312,9 @@ export default function AmaraChat({ language }) {
         aria-label={open ? ui.close : ui.open}
         aria-expanded={open}
       >
-        <span><ChatIcon /></span>
+        <span className="amara-launcher-avatar">
+          {open ? <ChatIcon /> : <img src={avatar} alt="" />}
+        </span>
         <strong>{open ? ui.close : ui.open}</strong>
         {!open && <i className="amara-notification">1</i>}
       </button>

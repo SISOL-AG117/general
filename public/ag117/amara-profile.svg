@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title description">
+  <title id="title">Amara, asistente virtual de AG117</title>
+  <description id="description">Emblema abstracto inspirado en arquitectura y vegetación.</description>
+  <defs>
+    <linearGradient id="background" x1="22" y1="18" x2="140" y2="145" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#245b4a"/>
+      <stop offset="1" stop-color="#102d25"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="52" y1="43" x2="111" y2="121" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#efffb2"/>
+      <stop offset="1" stop-color="#d7ff52"/>
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="78" fill="url(#background)"/>
+  <circle cx="80" cy="80" r="70" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/>
+  <path d="M42 115 72 43c3-7 13-7 16 0l30 72h-18l-7-18H67l-7 18H42Zm31-34h14L80 62l-7 19Z" fill="url(#accent)"/>
+  <path d="M101 43c14-8 26-5 31-1-3 14-14 23-29 24 5-6 9-13 11-19-5 5-9 9-13 16-2-8-1-15 0-20Z" fill="#ff8a6c"/>
+  <path d="M57 122h46" stroke="#fff" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>
+</svg>

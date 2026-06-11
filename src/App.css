@@ -2030,16 +2030,19 @@ footer > p {
 .amara-greeting-avatar,
 .amara-avatar {
   align-items: center;
-  background:
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 20%),
-    linear-gradient(145deg, var(--coral), #ffb24c);
+  background: var(--deep);
   border-radius: 50%;
-  color: var(--deep);
   display: flex;
-  font-family: 'Manrope', sans-serif;
-  font-weight: 600;
   justify-content: center;
   position: relative;
+}
+
+.amara-greeting-avatar img,
+.amara-avatar img {
+  border-radius: 50%;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .amara-greeting-avatar {
@@ -2119,6 +2122,13 @@ footer > p {
   height: 42px;
   justify-content: center;
   width: 42px;
+}
+
+.amara-launcher-avatar img {
+  border-radius: 50%;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .amara-launcher > span svg {
@@ -2338,6 +2348,29 @@ footer > p {
 .amara-quick button b {
   color: var(--coral);
   font-size: 1rem;
+}
+
+.amara-topics-toggle {
+  align-items: center;
+  align-self: flex-start;
+  background: rgba(23, 55, 46, 0.08);
+  border: 0;
+  border-radius: 999px;
+  color: rgba(23, 55, 46, 0.72);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.6rem;
+  font-weight: 600;
+  gap: 7px;
+  margin-top: 2px;
+  padding: 7px 11px;
+}
+
+.amara-topics-toggle span {
+  color: var(--coral);
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  line-height: 0.5;
 }
 
 .amara-advisor {
