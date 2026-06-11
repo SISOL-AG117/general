@@ -540,15 +540,15 @@ function App() {
             src={publicAsset('ag117/ivonne-hernandez.jpg')}
             alt="Ivonne Hernández Monroy, asesora inmobiliaria de AG117"
           />
+          <div className="advisor-exclusive">
+            <span>Beneficio especial AG117</span>
+            <strong>Descuento exclusivo</strong>
+            <p>Solo con Ivonne Hernández</p>
+          </div>
           <span className="advisor-photo-label">Tu asesora AG117</span>
         </div>
         <div className="advisor-copy" data-reveal>
           <p className="eyebrow light">Atención personal</p>
-          <div className="advisor-exclusive">
-            <span>Beneficio especial AG117</span>
-            <strong>Descuento exclusivo</strong>
-            <p>Disponible solo con Ivonne Hernández</p>
-          </div>
           <h2>Conoce AG117 de la mano de Ivonne.</h2>
           <p className="advisor-name">Ivonne Hernández Monroy</p>
           <p className="advisor-role">Asesora inmobiliaria AG117</p>

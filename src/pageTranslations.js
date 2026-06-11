@@ -114,7 +114,7 @@ export const pageTranslations = {
   'Atención personal': 'Personal guidance',
   'Beneficio especial AG117': 'Special AG117 benefit',
   'Descuento exclusivo': 'Exclusive discount',
-  'Disponible solo con Ivonne Hernández': 'Available only through Ivonne Hernández',
+  'Solo con Ivonne Hernández': 'Only through Ivonne Hernández',
   'Conoce AG117 de la mano de Ivonne.': 'Discover AG117 with Ivonne.',
   'Asesora inmobiliaria AG117': 'AG117 real estate advisor',
   'Resuelve tus dudas sobre disponibilidad, tipologías, planes de compra y encuentra la residencia que mejor acompaña tu proyecto de vida.': 'Get answers about availability, layouts and purchase plans, and find the residence that best fits your plans.',
