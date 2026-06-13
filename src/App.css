@@ -1642,8 +1642,98 @@ svg {
   color: var(--lime);
 }
 
+.price-search-panel {
+  align-items: end;
+  background: #ece9e0;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(240px, 1.4fr) minmax(160px, 0.7fr) minmax(170px, 0.8fr) auto;
+  margin: 22px 0 8px;
+  padding: 17px;
+}
+
+.price-search-panel label {
+  display: grid;
+  gap: 7px;
+}
+
+.price-search-panel label > span {
+  color: rgba(23, 55, 46, 0.55);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.price-search > div {
+  align-items: center;
+  background: white;
+  border: 1px solid transparent;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  min-height: 46px;
+  padding: 0 13px;
+}
+
+.price-search > div:focus-within {
+  border-color: var(--coral);
+}
+
+.price-search svg {
+  color: rgba(23, 55, 46, 0.45);
+  height: 17px;
+  margin-right: 9px;
+  width: 17px;
+}
+
+.price-search input,
+.price-search-panel select {
+  background: white;
+  border: 1px solid transparent;
+  color: var(--ink);
+  font-size: 0.76rem;
+  min-height: 46px;
+  outline: none;
+  width: 100%;
+}
+
+.price-search input {
+  background: transparent;
+  border: 0;
+  min-width: 0;
+}
+
+.price-search-panel select {
+  cursor: pointer;
+  padding: 0 12px;
+}
+
+.price-search-panel select:focus {
+  border-color: var(--coral);
+}
+
+.price-reset {
+  background: transparent;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  min-height: 46px;
+  padding: 0 15px;
+  text-transform: uppercase;
+}
+
+.price-reset:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
 .price-table-wrap {
+  opacity: 1;
   overflow-x: auto;
+  transform: none;
 }
 
 .price-table {
@@ -1708,6 +1798,30 @@ svg {
 .price-table tr.has-floor-plan:focus-visible {
   background: rgba(215, 255, 82, 0.22);
   box-shadow: inset 3px 0 var(--coral);
+}
+
+.price-empty td {
+  padding: 55px 20px;
+  text-align: center;
+}
+
+.price-empty td strong {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.price-empty button {
+  background: var(--lime);
+  border: 0;
+  color: var(--deep);
+  cursor: pointer;
+  font-size: 0.62rem;
+  font-weight: 700;
+  margin-top: 16px;
+  padding: 11px 15px;
+  text-transform: uppercase;
 }
 
 .plan-available {
@@ -3160,6 +3274,21 @@ footer > p {
     padding: 9px 7px;
   }
 
+  .price-search-panel {
+    align-items: stretch;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 18px;
+    padding: 14px;
+  }
+
+  .price-search {
+    grid-column: 1 / -1;
+  }
+
+  .price-reset {
+    grid-column: 1 / -1;
+  }
+
   .price-table {
     min-width: 0;
   }
@@ -3198,6 +3327,19 @@ footer > p {
     letter-spacing: 0.1em;
     margin-bottom: 5px;
     text-transform: uppercase;
+  }
+
+  .price-empty {
+    display: block !important;
+  }
+
+  .price-empty td {
+    padding: 45px 10px;
+    text-align: left;
+  }
+
+  .price-empty td::before {
+    display: none;
   }
 
   .price-note {

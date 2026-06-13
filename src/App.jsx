@@ -124,6 +124,18 @@ const currency = new Intl.NumberFormat('es-MX', {
   maximumFractionDigits: 0,
 })
 
+const normalizeSearch = (value) => value
+  .toLowerCase()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]/g, '')
+
+const getTypeFamily = (type) => {
+  if (type.startsWith('C1')) return 'C1'
+  if (type.startsWith('CE')) return 'CE'
+  return type.charAt(0)
+}
+
 function Arrow({ diagonal = false }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -158,6 +170,9 @@ function App() {
   const [activeResidence, setActiveResidence] = useState(0)
   const [activeGallery, setActiveGallery] = useState(0)
   const [priceTower, setPriceTower] = useState('Todas')
+  const [priceSearch, setPriceSearch] = useState('')
+  const [priceType, setPriceType] = useState('Todas')
+  const [priceRange, setPriceRange] = useState('Todos')
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [sent, setSent] = useState(false)
   const heroCard = useRef(null)
@@ -237,9 +252,31 @@ function App() {
   }
 
   const residence = residences[activeResidence]
-  const visiblePrices = priceTower === 'Todas'
-    ? priceUnits
-    : priceUnits.filter((unit) => unit.tower === priceTower)
+  const normalizedPriceSearch = normalizeSearch(priceSearch)
+  const visiblePrices = priceUnits.filter((unit) => {
+    const matchesTower = priceTower === 'Todas' || unit.tower === priceTower
+    const matchesType = priceType === 'Todas' || getTypeFamily(unit.type) === priceType
+    const matchesSearch = !normalizedPriceSearch || normalizeSearch(
+      `${unit.unit} ${unit.type} torre ${unit.tower} ${unit.view}`,
+    ).includes(normalizedPriceSearch)
+    const matchesRange = priceRange === 'Todos'
+      || (priceRange === 'Hasta 6 M' && unit.price <= 6000000)
+      || (priceRange === '6 a 8 M' && unit.price > 6000000 && unit.price <= 8000000)
+      || (priceRange === 'Más de 8 M' && unit.price > 8000000)
+
+    return matchesTower && matchesType && matchesSearch && matchesRange
+  })
+  const hasPriceFilters = priceTower !== 'Todas'
+    || priceType !== 'Todas'
+    || priceRange !== 'Todos'
+    || priceSearch !== ''
+
+  const resetPriceFilters = () => {
+    setPriceTower('Todas')
+    setPriceType('Todas')
+    setPriceRange('Todos')
+    setPriceSearch('')
+  }
 
   return (
     <main>
@@ -522,7 +559,50 @@ function App() {
           </div>
         </div>
 
-        <div className="price-table-wrap" data-reveal>
+        <div className="price-search-panel">
+          <label className="price-search">
+            <span>Buscar residencia</span>
+            <div>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="6" />
+                <path d="m16 16 4 4" />
+              </svg>
+              <input
+                type="search"
+                value={priceSearch}
+                onChange={(event) => setPriceSearch(event.target.value)}
+                placeholder="Ej. A-302, roof garden..."
+              />
+            </div>
+          </label>
+          <label>
+            <span>Tipología</span>
+            <select value={priceType} onChange={(event) => setPriceType(event.target.value)}>
+              {['Todas', 'A', 'B', 'C', 'C1', 'CE'].map((type) => (
+                <option key={type} value={type}>{type === 'Todas' ? 'Todas las tipologías' : `Tipología ${type}`}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Rango de precio</span>
+            <select value={priceRange} onChange={(event) => setPriceRange(event.target.value)}>
+              <option value="Todos">Todos los precios</option>
+              <option value="Hasta 6 M">Hasta $6 M</option>
+              <option value="6 a 8 M">$6 M a $8 M</option>
+              <option value="Más de 8 M">Más de $8 M</option>
+            </select>
+          </label>
+          <button
+            className="price-reset"
+            type="button"
+            onClick={resetPriceFilters}
+            disabled={!hasPriceFilters}
+          >
+            Limpiar filtros
+          </button>
+        </div>
+
+        <div className="price-table-wrap">
           <table className="price-table">
             <thead>
               <tr>
@@ -535,6 +615,14 @@ function App() {
               </tr>
             </thead>
             <tbody>
+              {visiblePrices.length === 0 && (
+                <tr className="price-empty">
+                  <td colSpan="6">
+                    <strong>No encontramos residencias con esos filtros.</strong>
+                    <button type="button" onClick={resetPriceFilters}>Ver todas las residencias</button>
+                  </td>
+                </tr>
+              )}
               {visiblePrices.map((unit) => (
                 <tr
                   key={unit.unit}
