@@ -214,6 +214,88 @@ function ResidentialFacade({ y, width, depth, units, side, furnished = false }) 
   )
 }
 
+function TowerEFacade({ y, width, depth, units }) {
+  const bay = width / units
+
+  return (
+    <group>
+      {[-1, 1].map((side) => {
+        const z = side * (depth / 2)
+        return (
+          <group key={`facade-${side}`}>
+            {Array.from({ length: units }).map((_, index) => {
+              const x = -width / 2 + bay / 2 + index * bay
+              return (
+                <group key={`${side}-${x}`}>
+                  <Box
+                    position={[x, y + 0.03, z + side * 0.07]}
+                    scale={[bay * 0.68, 1.06, 0.08]}
+                    color={facade.glass}
+                    metalness={0.36}
+                    roughness={0.08}
+                  />
+                  <Box
+                    position={[x, y + 0.57, z + side * 0.12]}
+                    scale={[bay * 0.7, 0.09, 0.11]}
+                    color={facade.frame}
+                  />
+                  <Box
+                    position={[x, y - 0.51, z + side * 0.12]}
+                    scale={[bay * 0.7, 0.09, 0.11]}
+                    color={facade.frame}
+                  />
+                  <FacadeLattice
+                    position={[x + (index % 2 === 0 ? bay * 0.3 : -bay * 0.3), y + 0.03, z + side * 0.18]}
+                    height={1.12}
+                  />
+                </group>
+              )
+            })}
+          </group>
+        )
+      })}
+
+      {[-1, 1].map((side) => {
+        const x = side * (width / 2)
+        return (
+          <group key={`terrace-${side}`}>
+            <Box
+              position={[x + side * 0.58, y - 0.7, 0]}
+              scale={[1.22, 0.13, depth + 0.25]}
+              color={facade.stone}
+            />
+            <Box
+              position={[x + side * 1.12, y - 0.4, 0]}
+              scale={[0.08, 0.62, depth + 0.12]}
+              color={facade.olive}
+            />
+            <Box
+              position={[x + side * 0.07, y + 0.03, 0]}
+              scale={[0.08, 1.06, depth * 0.68]}
+              color={facade.glass}
+              metalness={0.36}
+              roughness={0.08}
+            />
+            <Box
+              position={[x + side * 0.12, y + 0.03, 0]}
+              scale={[0.11, 1.06, 0.055]}
+              color={facade.frame}
+            />
+            <FoliageCluster
+              position={[x + side * 1.07, y - 0.06, -depth * 0.2]}
+              scale={0.72}
+            />
+            <FoliageCluster
+              position={[x + side * 1.07, y - 0.12, depth * 0.24]}
+              scale={0.58}
+            />
+          </group>
+        )
+      })}
+    </group>
+  )
+}
+
 function GroundLevel({ width, depth, units, type, visible }) {
   if (!visible) return null
   const bays = Math.max(3, Math.round(width / 2.2))
@@ -267,7 +349,7 @@ function GroundLevel({ width, depth, units, type, visible }) {
   )
 }
 
-function ResidentialLevel({ floor, width, depth, units, selected, visible }) {
+function ResidentialLevel({ floor, width, depth, units, selected, visible, sideTerraces = false }) {
   if (!visible) return null
   const y = 1.65 + floor * 1.45
   return (
@@ -277,8 +359,14 @@ function ResidentialLevel({ floor, width, depth, units, selected, visible }) {
         scale={[width, 1.32, depth]}
         color={selected ? '#f1eadc' : facade.stone}
       />
-      <ResidentialFacade y={y} width={width} depth={depth} units={units} side={1} furnished />
-      <ResidentialFacade y={y} width={width} depth={depth} units={units} side={-1} />
+      {sideTerraces ? (
+        <TowerEFacade y={y} width={width} depth={depth} units={units} />
+      ) : (
+        <>
+          <ResidentialFacade y={y} width={width} depth={depth} units={units} side={1} furnished />
+          <ResidentialFacade y={y} width={width} depth={depth} units={units} side={-1} />
+        </>
+      )}
     </group>
   )
 }
@@ -359,6 +447,7 @@ function BuildingWing({ tower, activeTower, level, onSelect }) {
           units={tower.units}
           selected={selected}
           visible={showAll || level === floor}
+          sideTerraces={tower.id === 'E'}
         />
       ))}
       <RoofTerraces
