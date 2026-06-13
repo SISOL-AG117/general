@@ -103,6 +103,7 @@ const priceUnits = [
 ]
 
 const floorPlans = {
+  'A-01': 'ag117/plans/a-01-c1.pdf',
   'A-301': 'ag117/plans/a-301-b-roof-garden.pdf',
   'A-302': 'ag117/plans/a-302-c-roof-garden.pdf',
   'A-303': 'ag117/plans/a-303-b-roof-garden.pdf',
@@ -110,10 +111,16 @@ const floorPlans = {
   'B-301': 'ag117/plans/b-301-b-roof-garden.pdf',
   'B-302': 'ag117/plans/b-302-c-roof-garden.pdf',
   'B-304': 'ag117/plans/b-304-c-roof-garden.pdf',
+  'C-01': 'ag117/plans/c-01-c1.pdf',
+  'C-02': 'ag117/plans/c-02-c1.pdf',
+  'C-03': 'ag117/plans/c-03-c1-pentgarden.pdf',
+  'C-05': 'ag117/plans/c-05-c1-pentgarden.pdf',
   'C-301': 'ag117/plans/c-301-b-roof-garden.pdf',
   'C-302': 'ag117/plans/c-302-c-roof-garden.pdf',
   'C-303': 'ag117/plans/c-303-b-roof-garden.pdf',
   'C-304': 'ag117/plans/c-304-c-roof-garden.pdf',
+  'D-01': 'ag117/plans/d-01-c1.pdf',
+  'D-05': 'ag117/plans/d-05-c1-pentgarden.pdf',
   'D-301': 'ag117/plans/d-301-a-roof-garden.pdf',
   'D-304': 'ag117/plans/d-304-c-roof-garden.pdf',
 }
@@ -346,7 +353,7 @@ function App() {
             <div className="card-shine" />
           </div>
           <div className="floating-tag tag-one">Residencias</div>
-          <div className="floating-tag tag-two">Entrega estimada · 2028</div>
+          <div className="floating-tag tag-two">Entrega estimada · Finales de 2028</div>
           <div className="orbit orbit-one" />
           <div className="orbit orbit-two" />
         </div>
@@ -538,7 +545,7 @@ function App() {
           </div>
           <div className="delivery-card">
             <span>Entrega estimada</span>
-            <strong>2028</strong>
+            <strong>Finales de 2028</strong>
             <p>Planea hoy el espacio que vas a disfrutar mañana.</p>
           </div>
         </div>
@@ -709,7 +716,7 @@ function App() {
             <footer className="plan-modal-actions">
               <div>
                 <strong>{currency.format(selectedPlan.price)}</strong>
-                <span>Precio de referencia · Entrega estimada 2028</span>
+                <span>Precio de referencia · Entrega estimada a finales de 2028</span>
               </div>
               <a
                 href={publicAsset(floorPlans[selectedPlan.unit])}
@@ -770,7 +777,7 @@ function App() {
             <Arrow diagonal />
           </a>
           <p className="delivery-reminder">
-            Entrega estimada del proyecto: <strong>2028</strong>
+            Entrega estimada del proyecto: <strong>Finales de 2028</strong>
           </p>
         </div>
       </section>
@@ -781,7 +788,7 @@ function App() {
           <h2>Recibe todos los detalles.</h2>
           <p>
             Déjanos tus datos para conversar sobre tipologías, disponibilidad,
-            precios y la entrega estimada para 2028.
+            precios y la entrega estimada para finales de 2028.
           </p>
         </div>
         <form

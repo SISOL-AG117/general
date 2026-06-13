@@ -75,8 +75,8 @@ function getReply(message, language) {
 
   if (hasAny(text, ['entrega', 'termina', 'cuando', 'fecha', 'delivery', 'ready', 'finish', '2028'])) {
     return isEnglish
-      ? 'The project’s estimated delivery is scheduled for 2028. For contractual milestones or a more precise schedule, Ivonne can review the current information with you.'
-      : 'La entrega estimada del proyecto está prevista para 2028. Para conocer hitos contractuales o un calendario más preciso, Ivonne puede revisar contigo la información vigente.'
+      ? 'The project’s estimated delivery is scheduled for late 2028. For contractual milestones or a more precise schedule, Ivonne can review the current information with you.'
+      : 'La entrega estimada del proyecto está prevista para finales de 2028. Para conocer hitos contractuales o un calendario más preciso, Ivonne puede revisar contigo la información vigente.'
   }
 
   if (hasAny(text, ['permiso', 'documento', 'legal', 'licencia', 'confidencial', 'escritura', 'permit', 'document', 'confidential', 'legal'])) {
