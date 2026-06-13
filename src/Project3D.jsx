@@ -13,6 +13,16 @@ const towers = [
 
 const floorLabels = ['Planta baja', 'Nivel 1', 'Nivel 2', 'Nivel 3', 'Roof garden']
 
+const facade = {
+  stone: '#e7dfce',
+  stoneShade: '#d1c5b2',
+  olive: '#596b24',
+  oliveDark: '#364919',
+  glass: '#46615e',
+  frame: '#806b4c',
+  lattice: '#d8cebb',
+}
+
 function Box({ position, scale, color, roughness = 0.8, metalness = 0, ...props }) {
   return (
     <mesh position={position} scale={scale} castShadow receiveShadow {...props}>
@@ -76,30 +86,127 @@ function Screen({ position, height = 1.1 }) {
   )
 }
 
-function GroundLevel({ width, depth, units, type, visible }) {
-  if (!visible) return null
-  const bays = Math.max(3, Math.round(width / 2.2))
-  const residential = type === 'residential'
-  const amenity = type === 'amenity'
+function FacadeLattice({ position, height = 1.12 }) {
+  return (
+    <group position={position}>
+      {[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3].map((x) => (
+        <Box
+          key={x}
+          position={[x, 0, 0]}
+          scale={[0.035, height, 0.055]}
+          color={facade.lattice}
+          roughness={0.92}
+        />
+      ))}
+      <Box position={[0, height / 2 - 0.04, 0]} scale={[0.7, 0.055, 0.055]} color={facade.lattice} />
+      <Box position={[0, -height / 2 + 0.04, 0]} scale={[0.7, 0.055, 0.055]} color={facade.lattice} />
+    </group>
+  )
+}
+
+function FoliageCluster({ position, scale = 1 }) {
+  const leaves = [
+    [-0.34, 0.02, 0, 0.26],
+    [-0.12, 0.08, 0.03, 0.32],
+    [0.14, 0.04, -0.02, 0.28],
+    [0.36, 0.1, 0.02, 0.24],
+  ]
+
+  return (
+    <group position={position} scale={scale}>
+      {leaves.map(([x, y, z, size], index) => (
+        <mesh key={x} position={[x, y, z]} scale={[1, 0.78, 0.72]} castShadow>
+          <icosahedronGeometry args={[size, 1]} />
+          <meshStandardMaterial
+            color={index % 2 === 0 ? '#536b2b' : '#748642'}
+            roughness={1}
+          />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function ResidentialFacade({ y, width, depth, units, side, furnished = false }) {
+  const bay = width / units
+  const z = side * (depth / 2)
+
   return (
     <group>
-      <Box position={[0, 0.75, 0]} scale={[width, 1.5, depth]} color="#e7e1d5" />
-      <Box position={[0, 1.52, depth / 2 + 0.22]} scale={[width + 0.35, 0.12, 0.48]} color="#718047" />
-      {Array.from({ length: amenity ? 3 : residential ? units : bays }).map((_, index, items) => {
-        const count = items.length
-        const x = -width / 2 + width / count / 2 + index * width / count
-        const panelWidth = width / count - 0.2
+      <Box
+        position={[0, y - 0.7, z + side * 0.55]}
+        scale={[width + 0.35, 0.13, 1.12]}
+        color={facade.stoneShade}
+      />
+      {Array.from({ length: units }).map((_, index) => {
+        const x = -width / 2 + bay / 2 + index * bay
+        const latticeX = x + (index % 2 === 0 ? bay * 0.31 : -bay * 0.31)
+        const glassX = x + (index % 2 === 0 ? -bay * 0.08 : bay * 0.08)
+
         return (
-          <group key={x}>
+          <group key={`${side}-${x}`}>
             <Box
-              position={[x, 0.78, depth / 2 + 0.02]}
-              scale={[panelWidth, 1.18, 0.06]}
-              color={residential ? '#176635' : amenity ? '#61716b' : '#48615a'}
-              metalness={0.3}
-              roughness={0.16}
+              position={[glassX, y + 0.03, z + side * 0.07]}
+              scale={[bay * 0.67, 1.06, 0.08]}
+              color={facade.glass}
+              metalness={0.36}
+              roughness={0.08}
             />
-            <Box position={[x - width / count / 2 + 0.05, 0.78, depth / 2 + 0.12]} scale={[0.07, 1.5, 0.1]} color="#9a845d" />
-            {amenity && <Screen position={[x, 0.78, depth / 2 + 0.16]} height={1.05} />}
+            <Box
+              position={[glassX, y + 0.57, z + side * 0.12]}
+              scale={[bay * 0.7, 0.09, 0.11]}
+              color={facade.frame}
+            />
+            <Box
+              position={[glassX, y - 0.51, z + side * 0.12]}
+              scale={[bay * 0.7, 0.09, 0.11]}
+              color={facade.frame}
+            />
+            <Box
+              position={[glassX, y + 0.03, z + side * 0.12]}
+              scale={[0.055, 1.06, 0.11]}
+              color={facade.frame}
+            />
+            <FacadeLattice
+              position={[latticeX, y + 0.03, z + side * 0.18]}
+              height={1.12}
+            />
+            <Box
+              position={[x, y - 0.4, z + side * 1.08]}
+              scale={[bay - 0.15, 0.62, 0.08]}
+              color={facade.olive}
+              roughness={0.72}
+            />
+            <Box
+              position={[x, y - 0.72, z + side * 0.61]}
+              scale={[bay - 0.08, 0.1, 1.2]}
+              color={facade.stone}
+            />
+            <FoliageCluster
+              position={[
+                x + (index % 2 === 0 ? bay * 0.16 : -bay * 0.16),
+                y - 0.02,
+                z + side * 1.04,
+              ]}
+              scale={0.82}
+            />
+            <FoliageCluster
+              position={[
+                x + (index % 2 === 0 ? -bay * 0.27 : bay * 0.27),
+                y - 0.12,
+                z + side * 1.04,
+              ]}
+              scale={0.58}
+            />
+            {furnished && (
+              <>
+                <BalconyFurniture x={x} y={y - 0.52} z={z + side * 0.82} />
+                <Plant
+                  position={[x - bay * 0.36, y - 0.5, z + side * 0.94]}
+                  scale={0.3}
+                />
+              </>
+            )}
           </group>
         )
       })}
@@ -107,31 +214,71 @@ function GroundLevel({ width, depth, units, type, visible }) {
   )
 }
 
+function GroundLevel({ width, depth, units, type, visible }) {
+  if (!visible) return null
+  const bays = Math.max(3, Math.round(width / 2.2))
+  const residential = type === 'residential'
+  const amenity = type === 'amenity'
+  return (
+    <group>
+      <Box position={[0, 0.75, 0]} scale={[width, 1.5, depth]} color={facade.stone} />
+      {[-1, 1].map((side) => (
+        <group key={side}>
+          <Box
+            position={[0, 1.48, side * (depth / 2 + 0.22)]}
+            scale={[width + 0.35, 0.16, 0.48]}
+            color={facade.olive}
+          />
+          {Array.from({ length: amenity ? 3 : residential ? units : bays }).map((_, index, items) => {
+            const count = items.length
+            const x = -width / 2 + width / count / 2 + index * width / count
+            const panelWidth = width / count - 0.2
+            return (
+              <group key={`${side}-${x}`}>
+                <Box
+                  position={[x, 0.76, side * (depth / 2 + 0.03)]}
+                  scale={[panelWidth, 1.24, 0.07]}
+                  color={amenity ? '#566963' : facade.glass}
+                  metalness={0.4}
+                  roughness={0.08}
+                />
+                <Box
+                  position={[x - width / count / 2 + 0.05, 0.76, side * (depth / 2 + 0.13)]}
+                  scale={[0.08, 1.5, 0.1]}
+                  color={facade.frame}
+                />
+                <Box
+                  position={[x, 0.12, side * (depth / 2 + 0.13)]}
+                  scale={[panelWidth, 0.08, 0.1]}
+                  color={facade.frame}
+                />
+                {amenity && (
+                  <Screen
+                    position={[x, 0.78, side * (depth / 2 + 0.17)]}
+                    height={1.05}
+                  />
+                )}
+              </group>
+            )
+          })}
+        </group>
+      ))}
+    </group>
+  )
+}
+
 function ResidentialLevel({ floor, width, depth, units, selected, visible }) {
   if (!visible) return null
   const y = 1.65 + floor * 1.45
-  const bay = width / units
   return (
     <group>
       <Box
         position={[0, y, 0]}
         scale={[width, 1.32, depth]}
-        color={selected ? '#eee8da' : '#ded8ca'}
+        color={selected ? '#f1eadc' : facade.stone}
       />
-      <Box position={[0, y - 0.7, depth / 2 + 0.58]} scale={[width + 0.35, 0.13, 1.2]} color="#d7d0c2" />
-      <Box position={[0, y - 0.42, depth / 2 + 1.12]} scale={[width + 0.2, 0.62, 0.08]} color="#738044" />
-      {Array.from({ length: units }).map((_, index) => {
-        const x = -width / 2 + bay / 2 + index * bay
-        return (
-          <group key={x}>
-            <Box position={[x, y + 0.02, depth / 2 + 0.06]} scale={[bay - 0.18, 1.12, 0.08]} color="#11622f" />
-            <Box position={[x - bay * 0.2, y + 0.02, depth / 2 + 0.12]} scale={[bay * 0.32, 1.05, 0.06]} color="#49645e" metalness={0.22} roughness={0.12} />
-            <Screen position={[x + bay * 0.25, y + 0.02, depth / 2 + 0.2]} height={1.05} />
-            <BalconyFurniture x={x} y={y - 0.52} z={depth / 2 + 0.96} />
-            <Plant position={[x - bay * 0.36, y - 0.5, depth / 2 + 1]} scale={0.34} />
-          </group>
-        )
-      })}
+      <ResidentialFacade y={y} width={width} depth={depth} units={units} side={1} furnished />
+      <ResidentialFacade y={y} width={width} depth={depth} units={units} side={-1} />
     </group>
   )
 }
@@ -142,8 +289,9 @@ function RoofTerraces({ width, depth, units, visible }) {
   const divisions = Array.from({ length: units + 1 })
   return (
     <group position={[0, 6.25, 0]}>
-      <Box position={[0, 0, 0]} scale={[width + 0.16, 0.14, depth + 0.12]} color="#ddd7ca" />
-      <Box position={[0, 0.48, -depth / 2 + 0.08]} scale={[width, 0.95, 0.14]} color="#c5c4c0" />
+      <Box position={[0, 0, 0]} scale={[width + 0.16, 0.14, depth + 0.12]} color={facade.stone} />
+      <Box position={[0, 0.48, -depth / 2 + 0.08]} scale={[width, 0.95, 0.14]} color={facade.stoneShade} />
+      <Box position={[0, 0.48, depth / 2 - 0.08]} scale={[width, 0.95, 0.14]} color={facade.oliveDark} />
       {divisions.map((_, index) => {
         const x = -width / 2 + index * bay
         return (
@@ -151,7 +299,7 @@ function RoofTerraces({ width, depth, units, visible }) {
             key={`division-${index}`}
             position={[x, 0.72, -0.15]}
             scale={[0.12, 1.45, depth - 0.45]}
-            color="#c9c7c3"
+            color={facade.stoneShade}
           />
         )
       })}
