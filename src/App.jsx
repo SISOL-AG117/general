@@ -102,6 +102,16 @@ const priceUnits = [
   { tower: 'E', level: '2', type: 'CE', unit: 'E-201', view: 'Calle', area: 95.45, beds: 2, baths: 2.5, study: false, price: 7500000 },
 ]
 
+const floorPlans = {
+  'A-302': 'ag117/plans/a-302-c-roof-garden.pdf',
+  'A-304': 'ag117/plans/a-304-c-roof-garden.pdf',
+  'B-302': 'ag117/plans/b-302-c-roof-garden.pdf',
+  'B-304': 'ag117/plans/b-304-c-roof-garden.pdf',
+  'C-302': 'ag117/plans/c-302-c-roof-garden.pdf',
+  'C-304': 'ag117/plans/c-304-c-roof-garden.pdf',
+  'D-304': 'ag117/plans/d-304-c-roof-garden.pdf',
+}
+
 const currency = new Intl.NumberFormat('es-MX', {
   style: 'currency',
   currency: 'MXN',
@@ -142,6 +152,7 @@ function App() {
   const [activeResidence, setActiveResidence] = useState(0)
   const [activeGallery, setActiveGallery] = useState(0)
   const [priceTower, setPriceTower] = useState('Todas')
+  const [selectedPlan, setSelectedPlan] = useState(null)
   const [sent, setSent] = useState(false)
   const heroCard = useRef(null)
 
@@ -186,6 +197,22 @@ function App() {
       observer.disconnect()
     }
   }, [language])
+
+  useEffect(() => {
+    if (!selectedPlan) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setSelectedPlan(null)
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [selectedPlan])
 
   const tiltHero = (event) => {
     if (!heroCard.current || window.matchMedia('(pointer: coarse)').matches) return
@@ -503,10 +530,24 @@ function App() {
             </thead>
             <tbody>
               {visiblePrices.map((unit) => (
-                <tr key={unit.unit}>
+                <tr
+                  key={unit.unit}
+                  className={floorPlans[unit.unit] ? 'has-floor-plan' : ''}
+                  tabIndex={floorPlans[unit.unit] ? 0 : undefined}
+                  onClick={() => {
+                    if (floorPlans[unit.unit]) setSelectedPlan(unit)
+                  }}
+                  onKeyDown={(event) => {
+                    if (floorPlans[unit.unit] && (event.key === 'Enter' || event.key === ' ')) {
+                      event.preventDefault()
+                      setSelectedPlan(unit)
+                    }
+                  }}
+                >
                   <td data-label="Residencia">
                     <strong>{unit.unit}</strong>
                     <span>Torre {unit.tower} · Nivel {unit.level}</span>
+                    {floorPlans[unit.unit] && <em className="plan-available">Ver plano</em>}
                   </td>
                   <td data-label="Tipología">{unit.type}</td>
                   <td data-label="Vista">{unit.view}</td>
@@ -525,6 +566,71 @@ function App() {
           Sujetos a cambio sin previo aviso. Confirma la información con tu asesora.
         </p>
       </section>
+
+      {selectedPlan && (
+        <div
+          className="plan-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setSelectedPlan(null)
+          }}
+        >
+          <section
+            className="plan-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="plan-modal-title"
+          >
+            <header className="plan-modal-head">
+              <div>
+                <p className="eyebrow">Plano arquitectónico</p>
+                <h2 id="plan-modal-title">Residencia {selectedPlan.unit}</h2>
+                <span>
+                  Torre {selectedPlan.tower} · {selectedPlan.type} · {selectedPlan.area.toFixed(2)} m²
+                </span>
+              </div>
+              <button
+                className="plan-modal-close"
+                type="button"
+                aria-label="Cerrar plano"
+                onClick={() => setSelectedPlan(null)}
+              >
+                ×
+              </button>
+            </header>
+
+            <div className="plan-modal-viewer">
+              <object
+                data={`${publicAsset(floorPlans[selectedPlan.unit])}#view=FitH`}
+                type="application/pdf"
+                title={`Plano de ${selectedPlan.unit}`}
+              >
+                <div className="plan-pdf-fallback">
+                  <strong>El visor PDF no está disponible en este navegador.</strong>
+                  <p>Abre el plano completo para consultarlo.</p>
+                </div>
+              </object>
+            </div>
+
+            <footer className="plan-modal-actions">
+              <div>
+                <strong>{currency.format(selectedPlan.price)}</strong>
+                <span>Precio de referencia · Entrega estimada 2028</span>
+              </div>
+              <a
+                href={publicAsset(floorPlans[selectedPlan.unit])}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Abrir plano completo <Arrow diagonal />
+              </a>
+              <a href={publicAsset(floorPlans[selectedPlan.unit])} download>
+                Descargar PDF
+              </a>
+            </footer>
+          </section>
+        </div>
+      )}
 
       <section className="closing-scene">
         <img src={publicAsset('ag117/living-dining.jpg')} alt="Sala y comedor con vista a la vegetación" />

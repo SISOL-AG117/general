@@ -1700,6 +1700,36 @@ svg {
   background: rgba(215, 255, 82, 0.18);
 }
 
+.price-table tr.has-floor-plan {
+  cursor: pointer;
+  outline: none;
+}
+
+.price-table tr.has-floor-plan:focus-visible {
+  background: rgba(215, 255, 82, 0.22);
+  box-shadow: inset 3px 0 var(--coral);
+}
+
+.plan-available {
+  align-items: center;
+  color: var(--coral);
+  display: flex;
+  font-size: 0.56rem;
+  font-style: normal;
+  font-weight: 700;
+  gap: 6px;
+  letter-spacing: 0.1em;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+.plan-available::before {
+  background: var(--coral);
+  content: '';
+  height: 5px;
+  width: 5px;
+}
+
 .price-note {
   color: rgba(23, 55, 46, 0.55);
   font-size: 0.62rem;
@@ -1707,6 +1737,157 @@ svg {
   margin: 22px 0 0 auto;
   max-width: 600px;
   text-align: right;
+}
+
+.plan-modal-backdrop {
+  align-items: center;
+  animation: planBackdropIn 0.3s ease both;
+  background: rgba(4, 24, 18, 0.82);
+  backdrop-filter: blur(10px);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 24px;
+  position: fixed;
+  z-index: 100;
+}
+
+@keyframes planBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.plan-modal {
+  animation: planModalIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  background: var(--paper);
+  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.42);
+  color: var(--ink);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: min(92vh, 980px);
+  max-width: 1380px;
+  overflow: hidden;
+  width: min(94vw, 1380px);
+}
+
+@keyframes planModalIn {
+  from { opacity: 0; transform: translateY(25px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.plan-modal-head {
+  align-items: center;
+  background: var(--deep);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 22px 26px;
+}
+
+.plan-modal-head .eyebrow {
+  color: var(--lime);
+  margin-bottom: 7px;
+}
+
+.plan-modal-head h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.8rem);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  margin: 0 0 5px;
+}
+
+.plan-modal-head > div > span {
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.68rem;
+}
+
+.plan-modal-close {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 1.7rem;
+  height: 46px;
+  justify-content: center;
+  width: 46px;
+}
+
+.plan-modal-viewer {
+  background: #d7d8d3;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.plan-modal-viewer object {
+  border: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.plan-pdf-fallback {
+  align-items: center;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.plan-pdf-fallback p {
+  color: rgba(23, 55, 46, 0.58);
+}
+
+.plan-modal-actions {
+  align-items: center;
+  background: white;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr auto auto;
+  padding: 16px 24px;
+}
+
+.plan-modal-actions > div strong,
+.plan-modal-actions > div span {
+  display: block;
+}
+
+.plan-modal-actions > div strong {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.plan-modal-actions > div span {
+  color: rgba(23, 55, 46, 0.48);
+  font-size: 0.58rem;
+  margin-top: 3px;
+}
+
+.plan-modal-actions a {
+  align-items: center;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  font-size: 0.62rem;
+  font-weight: 700;
+  gap: 9px;
+  letter-spacing: 0.08em;
+  min-height: 44px;
+  padding: 0 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.plan-modal-actions a:first-of-type {
+  background: var(--lime);
+  border-color: var(--lime);
 }
 
 .closing-scene {
@@ -3021,6 +3202,47 @@ footer > p {
 
   .price-note {
     text-align: left;
+  }
+
+  .plan-modal-backdrop {
+    padding: 0;
+  }
+
+  .plan-modal {
+    height: 100svh;
+    width: 100vw;
+  }
+
+  .plan-modal-head {
+    padding: max(16px, env(safe-area-inset-top)) 18px 16px;
+  }
+
+  .plan-modal-head h2 {
+    font-size: 1.7rem;
+  }
+
+  .plan-modal-head > div > span {
+    display: block;
+    max-width: 250px;
+  }
+
+  .plan-modal-viewer {
+    min-height: 0;
+  }
+
+  .plan-modal-actions {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 14px max(12px, env(safe-area-inset-bottom));
+  }
+
+  .plan-modal-actions > div {
+    grid-column: 1 / -1;
+  }
+
+  .plan-modal-actions a {
+    justify-content: center;
+    padding: 0 10px;
+    text-align: center;
   }
 
   .type-tabs {
