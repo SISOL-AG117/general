@@ -103,12 +103,18 @@ const priceUnits = [
 ]
 
 const floorPlans = {
+  'A-301': 'ag117/plans/a-301-b-roof-garden.pdf',
   'A-302': 'ag117/plans/a-302-c-roof-garden.pdf',
+  'A-303': 'ag117/plans/a-303-b-roof-garden.pdf',
   'A-304': 'ag117/plans/a-304-c-roof-garden.pdf',
+  'B-301': 'ag117/plans/b-301-b-roof-garden.pdf',
   'B-302': 'ag117/plans/b-302-c-roof-garden.pdf',
   'B-304': 'ag117/plans/b-304-c-roof-garden.pdf',
+  'C-301': 'ag117/plans/c-301-b-roof-garden.pdf',
   'C-302': 'ag117/plans/c-302-c-roof-garden.pdf',
+  'C-303': 'ag117/plans/c-303-b-roof-garden.pdf',
   'C-304': 'ag117/plans/c-304-c-roof-garden.pdf',
+  'D-301': 'ag117/plans/d-301-a-roof-garden.pdf',
   'D-304': 'ag117/plans/d-304-c-roof-garden.pdf',
 }
 
