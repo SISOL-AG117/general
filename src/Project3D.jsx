@@ -363,6 +363,25 @@ function GroundLevel({ width, depth, units, type, visible }) {
   )
 }
 
+function TowerEGroundLevel({ width, depth, visible }) {
+  if (!visible) return null
+
+  return (
+    <group>
+      <Box position={[0, 0.75, 0]} scale={[width, 1.5, depth]} color={facade.stone} />
+      {[-1, 1].map((side) => (
+        <Box
+          key={side}
+          position={[0, 0.75, side * (depth / 2 + 0.015)]}
+          scale={[width, 1.5, 0.05]}
+          color={facade.stone}
+          roughness={0.95}
+        />
+      ))}
+    </group>
+  )
+}
+
 function ResidentialLevel({ floor, width, depth, units, selected, visible, sideTerraces = false }) {
   if (!visible) return null
   const y = 1.65 + floor * 1.45
@@ -445,13 +464,21 @@ function BuildingWing({ tower, activeTower, level, onSelect }) {
         onSelect(tower.id)
       }}
     >
-      <GroundLevel
-        width={tower.width}
-        depth={tower.depth}
-        units={tower.units}
-        type={tower.base}
-        visible={showAll || level === 0}
-      />
+      {tower.id === 'E' ? (
+        <TowerEGroundLevel
+          width={tower.width}
+          depth={tower.depth}
+          visible={showAll || level === 0}
+        />
+      ) : (
+        <GroundLevel
+          width={tower.width}
+          depth={tower.depth}
+          units={tower.units}
+          type={tower.base}
+          visible={showAll || level === 0}
+        />
+      )}
       {[1, 2, 3].map((floor) => (
         <ResidentialLevel
           key={floor}
