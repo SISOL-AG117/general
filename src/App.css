@@ -227,7 +227,6 @@ svg {
 .hero-copy h1,
 .manifesto h2,
 .section-heading h2,
-.residences h2,
 .prices h2,
 .closing-scene h2,
 .contact h2,
@@ -472,7 +471,6 @@ svg {
 
 .manifesto h2,
 .section-heading h2,
-.residences h2,
 .prices h2,
 .contact h2,
 .advisor h2 {
@@ -1403,134 +1401,6 @@ svg {
   color: var(--coral);
   opacity: 1;
   transform: translateX(0);
-}
-
-.residences {
-  background: var(--forest);
-  color: white;
-}
-
-.residences-head {
-  align-items: end;
-  display: grid;
-  gap: 50px;
-  grid-template-columns: 1.5fr 0.5fr;
-}
-
-.residences-head > p {
-  color: rgba(255, 255, 255, 0.58);
-  line-height: 1.7;
-  margin: 0 0 8px;
-}
-
-.residence-selector {
-  background: var(--deep);
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  margin-top: 90px;
-  min-height: 650px;
-}
-
-.plan-stage {
-  align-items: center;
-  background: var(--cream);
-  display: flex;
-  justify-content: center;
-  min-height: 650px;
-  overflow: hidden;
-  padding: 50px;
-  position: relative;
-}
-
-.plan-grid {
-  background-image:
-    linear-gradient(rgba(23, 55, 46, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 55, 46, 0.07) 1px, transparent 1px);
-  background-size: 35px 35px;
-  inset: 0;
-  position: absolute;
-}
-
-.plan-stage img {
-  filter: contrast(1.03);
-  max-height: 520px;
-  object-fit: contain;
-  position: relative;
-  transition: opacity 0.3s ease;
-  z-index: 2;
-}
-
-.plan-scale {
-  bottom: 24px;
-  color: rgba(23, 55, 46, 0.5);
-  font-size: 0.6rem;
-  left: 28px;
-  letter-spacing: 0.16em;
-  position: absolute;
-  text-transform: uppercase;
-}
-
-.residence-details {
-  padding: clamp(45px, 6vw, 90px);
-}
-
-.type-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 70px;
-}
-
-.type-tabs button {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  color: white;
-  cursor: pointer;
-  height: 46px;
-  transition: background 0.3s ease, color 0.3s ease;
-  width: 46px;
-}
-
-.type-tabs button.is-active {
-  background: var(--lime);
-  border-color: var(--lime);
-  color: var(--deep);
-}
-
-.residence-details h3 {
-  font-family: 'Manrope', sans-serif;
-  font-size: clamp(2.3rem, 4vw, 4rem);
-  font-weight: 300;
-  letter-spacing: -0.05em;
-  margin: 0 0 20px;
-}
-
-.residence-copy {
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.7;
-  margin: 0 0 30px;
-}
-
-.residence-details ul {
-  display: grid;
-  gap: 13px;
-  list-style: none;
-  margin: 0 0 42px;
-  padding: 0;
-}
-
-.residence-details li {
-  align-items: center;
-  display: flex;
-  font-size: 0.82rem;
-  gap: 12px;
-}
-
-.residence-details li::before {
-  background: var(--coral);
-  content: '';
-  height: 5px;
-  width: 5px;
 }
 
 .button-lime,
@@ -2888,7 +2758,6 @@ footer > p {
   }
 
   .gallery-stage,
-  .residence-selector,
   .contact,
   .advisor,
   .ar-section {
@@ -2958,9 +2827,6 @@ footer > p {
     margin-right: 20px;
   }
 
-  .residence-details {
-    min-height: 600px;
-  }
 }
 
 @media (max-width: 760px) {
@@ -3096,14 +2962,12 @@ footer > p {
   }
 
   .manifesto,
-  .residences-head,
   .section-heading {
     grid-template-columns: 1fr;
   }
 
   .manifesto h2,
   .section-heading h2,
-  .residences h2,
   .prices h2,
   .contact h2,
   .advisor h2,
@@ -3222,30 +3086,6 @@ footer > p {
 
   .gallery-list button:nth-child(odd) {
     margin-right: 0;
-  }
-
-  .residences-head > p {
-    max-width: 420px;
-  }
-
-  .residence-selector {
-    margin-left: -24px;
-    margin-right: -24px;
-    margin-top: 60px;
-  }
-
-  .plan-stage {
-    min-height: 520px;
-    padding: 35px;
-  }
-
-  .plan-stage img {
-    max-height: 430px;
-  }
-
-  .residence-details {
-    min-height: 620px;
-    padding: 45px 28px 65px;
   }
 
   .prices-head {
@@ -3387,16 +3227,6 @@ footer > p {
     text-align: center;
   }
 
-  .type-tabs {
-    flex-wrap: wrap;
-    margin-bottom: 50px;
-  }
-
-  .type-tabs button {
-    height: 48px;
-    width: 48px;
-  }
-
   .closing-scene {
     height: 760px;
   }
@@ -3521,7 +3351,6 @@ footer > p {
 
   .manifesto h2,
   .section-heading h2,
-  .residences h2,
   .prices h2,
   .contact h2,
   .advisor h2,
@@ -3581,21 +3410,6 @@ footer > p {
   .gallery-title {
     max-width: calc(100% - 20px);
     padding: 16px 18px;
-  }
-
-  .residence-selector {
-    margin-left: -18px;
-    margin-right: -18px;
-  }
-
-  .plan-stage {
-    min-height: 430px;
-    padding: 25px;
-  }
-
-  .residence-details {
-    min-height: auto;
-    padding: 40px 22px 55px;
   }
 
   .delivery-card {

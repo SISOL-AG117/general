@@ -30,41 +30,6 @@ const gallery = [
   },
 ]
 
-const residences = [
-  {
-    id: 'A',
-    image: publicAsset('ag117/plan-a.png'),
-    eyebrow: 'Tipología A',
-    title: 'Esencial y luminosa',
-    copy: 'Una distribución inteligente que conecta las áreas sociales con la vegetación exterior.',
-    features: ['Terraza privada', 'Cocina abierta', 'Flujo natural'],
-  },
-  {
-    id: 'B',
-    image: publicAsset('ag117/plan-b.png'),
-    eyebrow: 'Tipología B',
-    title: 'Más espacio para vivir',
-    copy: 'Ambientes amplios, cálidos y flexibles para una vida cotidiana sin prisa.',
-    features: ['Área social amplia', 'Vistas al jardín', 'Opción roof garden'],
-  },
-  {
-    id: 'C',
-    image: publicAsset('ag117/plan-c.png'),
-    eyebrow: 'Tipología C',
-    title: 'Versatilidad total',
-    copy: 'Una residencia diseñada para evolucionar contigo y maximizar cada espacio.',
-    features: ['Opción lock-off', 'Alta privacidad', 'Distribución flexible'],
-  },
-  {
-    id: 'C1',
-    image: publicAsset('ag117/plan-c1.png'),
-    eyebrow: 'Tipología C1',
-    title: 'El jardín es tuyo',
-    copy: 'La experiencia más cercana al paisaje, con espacios que se abren al exterior.',
-    features: ['Pentgarden', 'Acceso a patio', 'Vida interior-exterior'],
-  },
-]
-
 const priceUnits = [
   { tower: 'A', level: 'PB', type: 'C1', unit: 'A-01', view: 'Jardín', area: 99.17, beds: 3, baths: 2.5, study: false, price: 6950000 },
   { tower: 'A', level: '1', type: 'B Lock off', unit: 'A-103', view: 'Calle', area: 113.73, beds: 2, baths: 2.5, study: true, price: 8800000 },
@@ -174,7 +139,6 @@ function App() {
     localStorage.getItem('ag117-language') === 'en' ? 'en' : 'es'
   ))
   const [menuOpen, setMenuOpen] = useState(false)
-  const [activeResidence, setActiveResidence] = useState(0)
   const [activeGallery, setActiveGallery] = useState(0)
   const [priceTower, setPriceTower] = useState('Todas')
   const [priceSearch, setPriceSearch] = useState('')
@@ -258,7 +222,6 @@ function App() {
     heroCard.current?.style.setProperty('--rotate-x', '0deg')
   }
 
-  const residence = residences[activeResidence]
   const normalizedPriceSearch = normalizeSearch(priceSearch)
   const visiblePrices = priceUnits.filter((unit) => {
     const matchesTower = priceTower === 'Todas' || unit.tower === priceTower
@@ -297,7 +260,6 @@ function App() {
           <a href="#maqueta" onClick={() => setMenuOpen(false)}>Maqueta 3D</a>
           <a href="#realidad-aumentada" onClick={() => setMenuOpen(false)}>Realidad AR</a>
           <a href="#espacios" onClick={() => setMenuOpen(false)}>Espacios</a>
-          <a href="#residencias" onClick={() => setMenuOpen(false)}>Residencias</a>
           <a href="#precios" onClick={() => setMenuOpen(false)}>Precios</a>
           <a href="#contacto" onClick={() => setMenuOpen(false)}>Contacto</a>
         </nav>
@@ -487,52 +449,6 @@ function App() {
                 <Arrow />
               </button>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="residences section-pad" id="residencias">
-        <div className="residences-head" data-reveal>
-          <div>
-            <p className="eyebrow light">Encuentra tu espacio</p>
-            <h2>Residencias que se adaptan a ti.</h2>
-          </div>
-          <p>
-            Cuatro tipologías, múltiples formas de vivir. Elige la que se
-            parezca a tu siguiente capítulo.
-          </p>
-        </div>
-
-        <div className="residence-selector" data-reveal>
-          <div className="plan-stage">
-            <span className="plan-grid" />
-            <img src={residence.image} alt={`Plano de ${residence.eyebrow}`} />
-            <span className="plan-scale">Planta arquitectónica</span>
-          </div>
-          <div className="residence-details">
-            <div className="type-tabs" role="tablist" aria-label="Tipologías">
-              {residences.map((item, index) => (
-                <button
-                  key={item.id}
-                  className={index === activeResidence ? 'is-active' : ''}
-                  type="button"
-                  role="tab"
-                  aria-selected={index === activeResidence}
-                  onClick={() => setActiveResidence(index)}
-                >
-                  {item.id}
-                </button>
-              ))}
-            </div>
-            <p className="eyebrow light">{residence.eyebrow}</p>
-            <h3>{residence.title}</h3>
-            <p className="residence-copy">{residence.copy}</p>
-            <ul>
-              {residence.features.map((feature) => <li key={feature}>{feature}</li>)}
-            </ul>
-            <a className="button-lime" href="#contacto">
-              Recibir disponibilidad <Arrow />
-            </a>
           </div>
         </div>
       </section>
@@ -836,7 +752,6 @@ function App() {
         <div className="footer-links">
           <a href="#concepto">Concepto</a>
           <a href="#realidad-aumentada">Realidad AR</a>
-          <a href="#residencias">Residencias</a>
           <a href="#precios">Precios</a>
           <a href="#contacto">Contacto</a>
         </div>
