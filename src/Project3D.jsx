@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { ContactShadows, Html, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
@@ -127,6 +127,58 @@ function FoliageCluster({ position, scale = 1 }) {
   )
 }
 
+function IvonneMural({ width, depth }) {
+  const texture = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 1600
+    canvas.height = 520
+    const context = canvas.getContext('2d')
+
+    context.fillStyle = '#e7dfce'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+    context.strokeStyle = '#596b24'
+    context.lineWidth = 18
+    context.strokeRect(28, 28, canvas.width - 56, canvas.height - 56)
+
+    context.textAlign = 'center'
+    context.fillStyle = '#364919'
+    context.font = '600 116px Georgia, serif'
+    context.fillText('Ivonne Hernández', canvas.width / 2, 225)
+
+    context.fillStyle = '#596b24'
+    context.font = '600 42px Arial, sans-serif'
+    context.letterSpacing = '8px'
+    context.fillText('ASESORA INMOBILIARIA · AG117', canvas.width / 2, 315)
+
+    context.fillStyle = '#364919'
+    context.font = '700 68px Arial, sans-serif'
+    context.fillText('55 1030 8232', canvas.width / 2, 415)
+
+    const map = new THREE.CanvasTexture(canvas)
+    map.colorSpace = THREE.SRGBColorSpace
+    map.anisotropy = 8
+    return map
+  }, [])
+
+  useEffect(() => () => texture.dispose(), [texture])
+
+  return (
+    <group>
+      {[-1, 1].map((side) => (
+        <mesh
+          key={side}
+          position={[0, 3.78, side * (depth / 2 + 0.015)]}
+          rotation={[0, side === 1 ? 0 : Math.PI, 0]}
+          scale={[width * 0.68, 2.2, 1]}
+        >
+          <planeGeometry />
+          <meshStandardMaterial map={texture} roughness={0.92} polygonOffset polygonOffsetFactor={-1} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 function ResidentialFacade({ y, width, depth, units, side, furnished = false }) {
   const bay = width / units
   const z = side * (depth / 2)
@@ -214,47 +266,9 @@ function ResidentialFacade({ y, width, depth, units, side, furnished = false }) 
   )
 }
 
-function TowerEFacade({ y, width, depth, units }) {
-  const bay = width / units
-
+function TowerEFacade({ y, width, depth }) {
   return (
     <group>
-      {[-1, 1].map((side) => {
-        const z = side * (depth / 2)
-        return (
-          <group key={`facade-${side}`}>
-            {Array.from({ length: units }).map((_, index) => {
-              const x = -width / 2 + bay / 2 + index * bay
-              return (
-                <group key={`${side}-${x}`}>
-                  <Box
-                    position={[x, y + 0.03, z + side * 0.07]}
-                    scale={[bay * 0.68, 1.06, 0.08]}
-                    color={facade.glass}
-                    metalness={0.36}
-                    roughness={0.08}
-                  />
-                  <Box
-                    position={[x, y + 0.57, z + side * 0.12]}
-                    scale={[bay * 0.7, 0.09, 0.11]}
-                    color={facade.frame}
-                  />
-                  <Box
-                    position={[x, y - 0.51, z + side * 0.12]}
-                    scale={[bay * 0.7, 0.09, 0.11]}
-                    color={facade.frame}
-                  />
-                  <FacadeLattice
-                    position={[x + (index % 2 === 0 ? bay * 0.3 : -bay * 0.3), y + 0.03, z + side * 0.18]}
-                    height={1.12}
-                  />
-                </group>
-              )
-            })}
-          </group>
-        )
-      })}
-
       {[-1, 1].map((side) => {
         const x = side * (width / 2)
         return (
@@ -450,6 +464,7 @@ function BuildingWing({ tower, activeTower, level, onSelect }) {
           sideTerraces={tower.id === 'E'}
         />
       ))}
+      {tower.id === 'E' && showAll && <IvonneMural width={tower.width} depth={tower.depth} />}
       <RoofTerraces
         width={tower.width}
         depth={tower.depth}
